@@ -6,21 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('mejas', function (Blueprint $table) {
             $table->id();
+            $table->string('nomor_meja')->unique();
+            $table->integer('kapasitas')->default(4);
+            $table->enum('status', ['tersedia', 'terisi', 'reservasi'])->default('tersedia');
+            $table->string('qr_code')->nullable();
+            $table->string('lokasi')->nullable();
+            $table->boolean('aktif')->default(true);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('mejas');
     }
