@@ -6,10 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
+    protected $table = 'menus';
+
     protected $fillable = [
-        'nama_menu',
+
+        'nama',
+
+        'kategori',
+
         'harga',
-        'stok',
-        'deskripsi'
+
+        'deskripsi',
+
+        'gambar',
+
+        'status',
+
     ];
+
 }

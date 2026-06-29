@@ -15,15 +15,23 @@ return new class extends Migration
 
             $table->id();
 
-            $table->string('nama_menu');
+            $table->string('nama');
+
+            $table->string('kategori');
 
             $table->integer('harga');
 
-            $table->integer('stok');
-
             $table->text('deskripsi')->nullable();
 
+            $table->string('gambar')->nullable();
+
+            $table->enum('status', [
+                'Tersedia',
+                'Habis'
+            ])->default('Tersedia');
+
             $table->timestamps();
+
         });
     }
 

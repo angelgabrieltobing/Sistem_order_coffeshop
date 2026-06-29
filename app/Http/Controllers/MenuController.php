@@ -2,60 +2,156 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produk;
-use App\Models\Kategori;
+use App\Http\Requests\MenuRequest;
+use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
     /**
-     * Menampilkan daftar menu untuk pelanggan
+     * Menampilkan daftar menu
      */
     public function index(Request $request)
     {
-        $kategoris = Kategori::where('aktif', true)->get();
-        
-        $query = Produk::with('kategori')
-            ->where('aktif', true)
-            ->where('stok', '>', 0);
+        $query = Menu::query();
 
-        // Filter berdasarkan kategori
-        if ($request->has('kategori') && $request->kategori != '') {
-            $query->where('kategori_id', $request->kategori);
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+
+            $query->where('nama', 'like', '%' . $request->search . '%');
+
         }
 
-        // Cari berdasarkan nama
-        if ($request->has('cari') && $request->cari != '') {
-            $query->where('nama', 'LIKE', '%' . $request->cari . '%');
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Status
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('status')) {
+
+            $query->where('status', $request->status);
+
         }
 
-        $produks = $query->get();
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Kategori
+        |--------------------------------------------------------------------------
+        */
 
-        return view('menu.index', compact('produks', 'kategoris'));
+        if ($request->filled('kategori')) {
+
+            $query->where('kategori', $request->kategori);
+
+        }
+
+        $menus = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.menu.index', compact('menus'));
     }
 
     /**
-     * Menampilkan detail produk
+     * Form tambah menu
      */
-    public function show(int $id)
+    public function create()
     {
-        $produk = Produk::with('kategori')->findOrFail($id);
-        return view('menu.show', compact('produk'));
+        return view('admin.menu.create');
     }
 
     /**
-     * API: Get menu for mobile/QR Code
+     * Simpan menu
      */
-    public function apiMenu()
+    public function store(MenuRequest $request)
     {
-        $produks = Produk::with('kategori')
-            ->where('aktif', true)
-            ->where('stok', '>', 0)
-            ->get();
+        $data = $request->validated();
 
-        return response()->json([
-            'status' => 'sukses',
-            'data' => $produks
-        ]);
+        if ($request->hasFile('gambar')) {
+
+            $data['gambar'] = $request
+                ->file('gambar')
+                ->store('menu', 'public');
+
+        }
+
+        Menu::create($data);
+
+        return redirect()
+            ->route('admin.menu.index')
+            ->with('success', 'Menu berhasil ditambahkan.');
+    }
+
+    /**
+     * Detail menu
+     */
+    public function show(Menu $menu)
+    {
+        return view('admin.menu.show', compact('menu'));
+    }
+
+    /**
+     * Form edit
+     */
+    public function edit(Menu $menu)
+    {
+        return view('admin.menu.edit', compact('menu'));
+    }
+
+    /**
+     * Update menu
+     */
+    public function update(MenuRequest $request, Menu $menu)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('gambar')) {
+
+            if ($menu->gambar &&
+                Storage::disk('public')->exists($menu->gambar)) {
+
+                Storage::disk('public')->delete($menu->gambar);
+
+            }
+
+            $data['gambar'] = $request
+                ->file('gambar')
+                ->store('menu', 'public');
+        }
+
+        $menu->update($data);
+
+        return redirect()
+            ->route('admin.menu.index')
+            ->with('success', 'Menu berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus menu
+     */
+    public function destroy(Menu $menu)
+    {
+        if (
+            $menu->gambar &&
+            Storage::disk('public')->exists($menu->gambar)
+        ) {
+
+            Storage::disk('public')->delete($menu->gambar);
+
+        }
+
+        $menu->delete();
+
+        return redirect()
+            ->route('admin.menu.index')
+            ->with('success', 'Menu berhasil dihapus.');
     }
 }

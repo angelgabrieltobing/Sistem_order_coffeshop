@@ -1,52 +1,245 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="id">
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+<head>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+<meta charset="UTF-8">
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+<title>Register | Coffee Shop</title>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+<link
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+<style>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+*{
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+}
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+body{
+
+background:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80');
+
+background-size:cover;
+
+background-position:center;
+
+}
+
+.overlay{
+
+width:100%;
+min-height:100vh;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+background:rgba(0,0,0,.65);
+
+padding:40px;
+
+}
+
+.register{
+
+width:470px;
+
+background:rgba(255,255,255,.12);
+
+backdrop-filter:blur(10px);
+
+padding:40px;
+
+border-radius:20px;
+
+color:white;
+
+}
+
+.logo{
+
+font-size:60px;
+
+text-align:center;
+
+}
+
+.form-control{
+
+height:50px;
+
+border-radius:10px;
+
+}
+
+.btn-register{
+
+width:100%;
+
+height:50px;
+
+border:none;
+
+background:#c47b39;
+
+color:white;
+
+border-radius:10px;
+
+font-weight:bold;
+
+}
+
+.btn-register:hover{
+
+background:#8b5e34;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="overlay">
+
+<div class="register">
+
+<div class="logo">
+
+☕
+
+</div>
+
+<h2 class="text-center mb-4">
+
+Register Coffee Shop
+
+</h2>
+
+<form
+method="POST"
+action="{{ route('register') }}">
+
+@csrf
+
+@if($errors->any())
+
+<div class="alert alert-danger">
+
+@foreach($errors->all() as $error)
+
+<div>{{ $error }}</div>
+
+@endforeach
+
+</div>
+
+@endif
+
+<div class="mb-3">
+
+<label>Nama</label>
+
+<input
+type="text"
+name="name"
+value="{{ old('name') }}"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Email</label>
+
+<input
+type="email"
+name="email"
+value="{{ old('email') }}"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Password</label>
+
+<input
+type="password"
+name="password"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-4">
+
+<label>Konfirmasi Password</label>
+
+<input
+type="password"
+name="password_confirmation"
+class="form-control"
+required>
+
+</div>
+
+<button
+type="submit"
+class="btn btn-register">
+
+Register
+
+</button>
+
+<div class="text-center mt-4">
+
+Sudah punya akun?
+
+<a
+href="{{ route('login') }}"
+class="text-warning">
+
+Login
+
+</a>
+
+</div>
+
+<div class="text-center mt-3">
+
+<a
+href="{{ route('home') }}"
+class="text-white">
+
+← Kembali ke Home
+
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
