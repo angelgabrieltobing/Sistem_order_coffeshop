@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
+
 {
     protected $table = 'menus';
 
@@ -18,10 +19,16 @@ class Menu extends Model
 
         'deskripsi',
 
+        
         'gambar',
 
         'status',
 
+        
     ];
+    public function itemPesanans()
+{
+    return $this->hasMany(ItemPesanan::class);
+}
 
 }

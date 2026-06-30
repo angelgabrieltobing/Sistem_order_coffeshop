@@ -118,7 +118,7 @@ box-shadow:0 5px 15px rgba(0,0,0,.1);
 
 <h3>☕ Coffee Shop</h3>
 
-<a href="{{ route('dashboard') }}">
+<a href="{{ route('admin.dashboard') }}">
 <i class="fa fa-chart-line"></i>
 Dashboard
 </a>
@@ -128,19 +128,19 @@ Dashboard
 Kelola Menu
 </a>
 
-<a href="#">
-<i class="fa fa-shopping-cart"></i>
-Pesanan
+<a href="{{ route('admin.pesanan.index') }}">
+    <i class="fa fa-shopping-cart"></i>
+    Pesanan
+</a>
+
+<a href="{{ route('admin.users.index') }}">
+    <i class="fa fa-users"></i>
+    User
 </a>
 
 <a href="#">
-<i class="fa fa-users"></i>
-User
-</a>
-
-<a href="#">
-<i class="fa fa-chart-bar"></i>
-Laporan
+    <i class="fa fa-chart-bar"></i>
+    Laporan
 </a>
 
 <div style="position:absolute;bottom:25px;width:100%;padding:20px;">

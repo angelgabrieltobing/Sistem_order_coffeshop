@@ -7,7 +7,7 @@
             <!-- Logo -->
             <div>
 
-                <a href="{{ route('dashboard') }}"
+                <a href="{{ route('admin.dashboard') }}"
                    class="text-white text-decoration-none fw-bold fs-4">
 
                     ☕ Coffee Shop
@@ -19,7 +19,7 @@
             <!-- Desktop Menu -->
             <div class="d-none d-md-flex align-items-center gap-3">
 
-                <a href="{{ route('dashboard') }}"
+                <a href="{{ route('admin.dashboard') }}"
                    class="text-white text-decoration-none">
 
                     Dashboard
@@ -82,7 +82,7 @@
             class="pb-3 d-md-none">
 
             <a
-                href="{{ route('dashboard') }}"
+                href="{{ route('admin.dashboard') }}"
                 class="d-block text-white text-decoration-none py-2">
 
                 Dashboard

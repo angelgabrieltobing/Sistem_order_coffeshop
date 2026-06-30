@@ -1,82 +1,80 @@
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coffee Shop</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
 
-    <style>
-        .hero {
-            height: 90vh;
-            background: linear-gradient(
-                rgba(0,0,0,0.6),
-                rgba(0,0,0,0.6)
-            ),
-            url('https://images.unsplash.com/photo-1509042239860-f550ce710b93');
-            background-size: cover;
-            background-position: center;
-            color: white;
-        }
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
 
-        .menu-card{
-            transition:0.3s;
-        }
+<title>Coffee Shop</title>
 
-        .menu-card:hover{
-            transform:translateY(-8px);
-        }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
 
-        .price{
-            color:#8B4513;
-            font-weight:bold;
-            font-size:20px;
-        }
-    </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+rel="stylesheet">
 
 </head>
+
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
-        <a class="navbar-brand fw-bold" href="/">
-            ☕ Coffee Shop
-        </a>
+<div class="container">
 
-        <button class="navbar-toggler" data-bs-toggle="collapse"
-            data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<a
+class="navbar-brand"
+href="{{ route('home') }}">
 
-        <div class="collapse navbar-collapse" id="navbarNav">
+☕
 
-            <ul class="navbar-nav ms-auto">
+Coffee Shop
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
-                </li>
+</a>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#menu">Menu</a>
-                </li>
+<div>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Tentang</a>
-                </li>
+<a
+href="{{ route('menu') }}"
+class="btn btn-outline-light">
 
-                <li class="nav-item">
-                    <a class="nav-link btn btn-warning text-dark ms-2 px-3">
-                        Pesan Sekarang
-                    </a>
-                </li>
+Menu
 
-            </ul>
+</a>
 
-        </div>
+<a
+href="{{ route('cart.index') }}"
+class="btn btn-warning">
 
-    </div>
+<i class="fa fa-shopping-cart"></i>
+
+Keranjang
+
+</a>
+
+<form
+action="{{ route('logout') }}"
+method="POST"
+class="d-inline">
+
+@csrf
+
+<button
+class="btn btn-danger">
+
+Logout
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
 </nav>
 
 @yield('content')
@@ -84,4 +82,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>

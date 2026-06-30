@@ -6,29 +6,163 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
         Schema::create('pesanans', function (Blueprint $table) {
+
             $table->id();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Nomor Pesanan
+            |--------------------------------------------------------------------------
+            */
+
             $table->string('nomor_pesanan')->unique();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Customer
+            |--------------------------------------------------------------------------
+            */
+
             $table->string('nama_pelanggan');
-            $table->foreignId('meja_id')->constrained('mejas')->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->decimal('total_harga', 10, 2);
-            $table->enum('status', ['menunggu', 'proses', 'selesai', 'batal'])->default('menunggu');
-            $table->enum('status_pembayaran', ['belum_bayar', 'lunas', 'refund'])->default('belum_bayar');
-            $table->enum('metode_pembayaran', ['tunai', 'debit', 'kredit', 'qris'])->nullable();
-            $table->decimal('jumlah_bayar', 10, 2)->nullable();
-            $table->decimal('kembalian', 10, 2)->nullable();
-            $table->text('catatan')->nullable();
-            $table->timestamp('tanggal_pesanan')->nullable();
-            $table->timestamp('selesai_pada')->nullable();
-            $table->timestamp('bayar_pada')->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Relasi Meja
+            |--------------------------------------------------------------------------
+            */
+
+            $table->foreignId('meja_id')
+                  ->constrained('mejas')
+                  ->cascadeOnDelete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | User Login (Opsional)
+            |--------------------------------------------------------------------------
+            */
+
+            $table->foreignId('user_id')
+                  ->nullable()
+                  ->constrained('users')
+                  ->nullOnDelete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Total Harga
+            |--------------------------------------------------------------------------
+            */
+
+            $table->decimal('total_harga', 12, 2)->default(0);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Status Pesanan
+            |--------------------------------------------------------------------------
+            */
+
+            $table->enum('status', [
+
+                'Menunggu',
+
+                'Diproses',
+
+                'Selesai',
+
+                'Dibatalkan',
+
+            ])->default('Menunggu');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Pembayaran
+            |--------------------------------------------------------------------------
+            */
+
+            $table->enum('status_pembayaran', [
+
+                'Belum Bayar',
+
+                'Lunas',
+
+                'Refund',
+
+            ])->default('Belum Bayar');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Metode Pembayaran
+            |--------------------------------------------------------------------------
+            */
+
+            $table->enum('metode_pembayaran', [
+
+                'Tunai',
+
+                'Debit',
+
+                'Kredit',
+
+                'QRIS',
+
+            ])->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Nominal Pembayaran
+            |--------------------------------------------------------------------------
+            */
+
+            $table->decimal('jumlah_bayar', 12, 2)
+                  ->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Kembalian
+            |--------------------------------------------------------------------------
+            */
+
+            $table->decimal('kembalian', 12, 2)
+                  ->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Catatan
+            |--------------------------------------------------------------------------
+            */
+
+            $table->text('catatan')
+                  ->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Waktu
+            |--------------------------------------------------------------------------
+            */
+
+            $table->timestamp('tanggal_pesanan')
+                  ->nullable();
+
+            $table->timestamp('bayar_pada')
+                  ->nullable();
+
+            $table->timestamp('selesai_pada')
+                  ->nullable();
+
             $table->timestamps();
+
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::dropIfExists('pesanans');
     }

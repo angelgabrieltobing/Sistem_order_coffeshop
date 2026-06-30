@@ -2,52 +2,98 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\MenuController;
-use App\Http\Controllers\DashboardController;
-
 /*
 |--------------------------------------------------------------------------
-| Halaman Home
+| Admin Controllers
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MenuController as AdminMenuController;
+use App\Http\Controllers\Admin\PesananController;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
-| Halaman User
+| Customer Controllers
 |--------------------------------------------------------------------------
 */
 
-Route::get('/menu', [MenuController::class, 'index'])
-    ->name('menu');
-
-Route::get('/tentang', function () {
-    return view('tentang');
-})->name('tentang');
+use App\Http\Controllers\Customer\HomeController;
+use App\Http\Controllers\Customer\MenuController as CustomerMenuController;
+use App\Http\Controllers\Customer\CartController;
+use App\Http\Controllers\Customer\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
-| Admin
+| Public Routes
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth','admin'])->prefix('admin')->group(function () {
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
-    Route::get('/dashboard', [DashboardController::class,'index'])
-        ->name('dashboard');
-
-    Route::resource('/menu', MenuController::class)
-        ->names('admin.menu');
-
-});
+Route::view('/tentang', 'tentang')
+    ->name('tentang');
 
 /*
 |--------------------------------------------------------------------------
-| Authentication
+| Authentication Routes
 |--------------------------------------------------------------------------
 */
 
 require __DIR__.'/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| Customer Area
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','customer'])->group(function () {
+
+    Route::get('/menu', [CustomerMenuController::class, 'index'])
+        ->name('menu');
+
+    Route::get('/cart', [CartController::class, 'index'])
+        ->name('cart.index');
+
+    Route::post('/cart/add/{menu}', [CartController::class, 'add'])
+        ->name('cart.add');
+
+    Route::post('/cart/update/{menu}', [CartController::class, 'update'])
+        ->name('cart.update');
+
+    Route::delete('/cart/remove/{menu}', [CartController::class, 'remove'])
+        ->name('cart.remove');
+
+    Route::delete('/cart/clear', [CartController::class, 'clear'])
+        ->name('cart.clear');
+
+    Route::get('/checkout', [CheckoutController::class, 'index'])
+        ->name('checkout.index');
+
+    Route::post('/checkout', [CheckoutController::class, 'store'])
+        ->name('checkout.store');
+});
+/*
+|--------------------------------------------------------------------------
+| Admin Area
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin')
+    ->middleware(['auth','admin'])
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::resource('menu', AdminMenuController::class);
+
+        Route::resource('pesanan', PesananController::class);
+
+        Route::resource('users', UserController::class);
+
+    });

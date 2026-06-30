@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\MenuRequest;
 use App\Models\Menu;
 use Illuminate\Http\Request;
@@ -10,46 +11,25 @@ use Illuminate\Support\Facades\Storage;
 class MenuController extends Controller
 {
     /**
-     * Menampilkan daftar menu
+     * Menampilkan daftar menu.
      */
     public function index(Request $request)
     {
         $query = Menu::query();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
-
+        // Search
         if ($request->filled('search')) {
-
             $query->where('nama', 'like', '%' . $request->search . '%');
-
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Filter Status
-        |--------------------------------------------------------------------------
-        */
-
+        // Filter Status
         if ($request->filled('status')) {
-
             $query->where('status', $request->status);
-
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Filter Kategori
-        |--------------------------------------------------------------------------
-        */
-
+        // Filter Kategori
         if ($request->filled('kategori')) {
-
             $query->where('kategori', $request->kategori);
-
         }
 
         $menus = $query
@@ -61,7 +41,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Form tambah menu
+     * Form tambah menu.
      */
     public function create()
     {
@@ -69,18 +49,14 @@ class MenuController extends Controller
     }
 
     /**
-     * Simpan menu
+     * Simpan menu baru.
      */
     public function store(MenuRequest $request)
     {
         $data = $request->validated();
 
         if ($request->hasFile('gambar')) {
-
-            $data['gambar'] = $request
-                ->file('gambar')
-                ->store('menu', 'public');
-
+            $data['gambar'] = $request->file('gambar')->store('menu', 'public');
         }
 
         Menu::create($data);
@@ -91,7 +67,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Detail menu
+     * Detail menu.
      */
     public function show(Menu $menu)
     {
@@ -99,7 +75,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Form edit
+     * Form edit menu.
      */
     public function edit(Menu $menu)
     {
@@ -107,7 +83,7 @@ class MenuController extends Controller
     }
 
     /**
-     * Update menu
+     * Update menu.
      */
     public function update(MenuRequest $request, Menu $menu)
     {
@@ -115,16 +91,13 @@ class MenuController extends Controller
 
         if ($request->hasFile('gambar')) {
 
-            if ($menu->gambar &&
-                Storage::disk('public')->exists($menu->gambar)) {
-
+            // Hapus gambar lama
+            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
                 Storage::disk('public')->delete($menu->gambar);
-
             }
 
-            $data['gambar'] = $request
-                ->file('gambar')
-                ->store('menu', 'public');
+            // Upload gambar baru
+            $data['gambar'] = $request->file('gambar')->store('menu', 'public');
         }
 
         $menu->update($data);
@@ -135,17 +108,12 @@ class MenuController extends Controller
     }
 
     /**
-     * Hapus menu
+     * Hapus menu.
      */
     public function destroy(Menu $menu)
     {
-        if (
-            $menu->gambar &&
-            Storage::disk('public')->exists($menu->gambar)
-        ) {
-
+        if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
             Storage::disk('public')->delete($menu->gambar);
-
         }
 
         $menu->delete();

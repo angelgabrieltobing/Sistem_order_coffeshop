@@ -9,16 +9,31 @@ class Meja extends Model
 {
     use HasFactory;
 
+    /**
+     * Nama tabel
+     */
     protected $table = 'mejas';
 
+    /**
+     * Mass Assignment
+     */
     protected $fillable = [
+
         'nomor_meja',
+
         'kapasitas',
-        'status', // tersedia, terisi, reservasi
-        'qr_code',
+
+        'status',
+
         'lokasi',
-        'aktif',
+
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relasi Pesanan
+    |--------------------------------------------------------------------------
+    */
 
     public function pesanans()
     {

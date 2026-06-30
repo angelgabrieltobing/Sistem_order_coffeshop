@@ -1,83 +1,120 @@
-<div class="max-w-7xl mx-auto px-6 py-10">
+@extends('layouts.app')
 
-    <h1 class="text-4xl font-bold text-center mb-10">
-        ☕ Menu Favorit
-    </h1>
+@section('title', 'Menu Coffee Shop')
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+@section('content')
 
-        <!-- Espresso -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl duration-300">
+<div class="container py-5">
 
-            <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800"
-                class="w-full h-60 object-cover">
+    <div class="row mb-5">
 
-            <div class="p-5 text-center">
+        <div class="col-md-12 text-center">
 
-                <h2 class="text-2xl font-bold">
-                    Espresso
-                </h2>
+            <h2 class="fw-bold">
 
-                <p class="text-gray-500 mt-2">
-                    Kopi hitam dengan cita rasa kuat.
-                </p>
+                ☕ Coffee Shop Menu
 
-                <h3 class="text-xl font-bold text-amber-700 mt-4">
-                    Rp 18.000
-                </h3>
+            </h2>
 
-            </div>
+            <p class="text-muted">
 
-        </div>
+                Pilih menu favoritmu dan tambahkan ke keranjang.
 
-        <!-- Cappuccino -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl duration-300">
-
-            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800"
-                class="w-full h-60 object-cover">
-
-            <div class="p-5 text-center">
-
-                <h2 class="text-2xl font-bold">
-                    Cappuccino
-                </h2>
-
-                <p class="text-gray-500 mt-2">
-                    Espresso dipadukan dengan susu dan foam.
-                </p>
-
-                <h3 class="text-xl font-bold text-amber-700 mt-4">
-                    Rp 28.000
-                </h3>
-
-            </div>
-
-        </div>
-
-        <!-- Latte -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl duration-300">
-
-            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800"
-                class="w-full h-60 object-cover">
-
-            <div class="p-5 text-center">
-
-                <h2 class="text-2xl font-bold">
-                    Latte
-                </h2>
-
-                <p class="text-gray-500 mt-2">
-                    Espresso dengan susu segar pilihan.
-                </p>
-
-                <h3 class="text-xl font-bold text-amber-700 mt-4">
-                    Rp 30.000
-                </h3>
-
-            </div>
+            </p>
 
         </div>
 
     </div>
 
+    <div class="row">
+
+        @forelse($menus as $menu)
+
+        <div class="col-lg-4 col-md-6 mb-4">
+
+            <div class="card shadow h-100 border-0">
+
+                @if($menu->gambar)
+
+                    <img
+                        src="{{ asset('storage/'.$menu->gambar) }}"
+                        class="card-img-top"
+                        style="height:250px;object-fit:cover;">
+
+                @else
+
+                    <img
+                        src="https://via.placeholder.com/500x300?text=Coffee+Menu"
+                        class="card-img-top">
+
+                @endif
+
+                <div class="card-body">
+
+                    <span class="badge bg-warning text-dark mb-2">
+
+                        {{ $menu->kategori }}
+
+                    </span>
+
+                    <h4 class="fw-bold">
+
+                        {{ $menu->nama }}
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        {{ $menu->deskripsi }}
+
+                    </p>
+
+                    <h5 class="text-success fw-bold">
+
+                        Rp {{ number_format($menu->harga,0,',','.') }}
+
+                    </h5>
+
+                </div>
+
+                <div class="card-footer bg-white border-0">
+
+                    <form action="#" method="POST">
+
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="btn btn-dark w-100">
+
+                            🛒 Tambah ke Keranjang
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        @empty
+
+        <div class="col-12">
+
+            <div class="alert alert-warning text-center">
+
+                Belum ada menu yang tersedia.
+
+            </div>
+
+        </div>
+
+        @endforelse
+
+    </div>
+
 </div>
+
+@endsection

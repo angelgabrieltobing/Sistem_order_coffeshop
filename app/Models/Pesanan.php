@@ -12,43 +12,93 @@ class Pesanan extends Model
     protected $table = 'pesanans';
 
     protected $fillable = [
+
         'nomor_pesanan',
+
         'nama_pelanggan',
+
         'meja_id',
+
         'user_id',
+
         'total_harga',
-        'status', // menunggu, proses, selesai, batal
-        'status_pembayaran', // belum_bayar, lunas, refund
-        'metode_pembayaran', // tunai, debit, kredit, qris
+
+        'status',
+
+        'status_pembayaran',
+
+        'metode_pembayaran',
+
         'jumlah_bayar',
+
         'kembalian',
+
         'catatan',
+
         'tanggal_pesanan',
+
         'selesai_pada',
+
         'bayar_pada',
+
     ];
 
     protected $casts = [
+
         'tanggal_pesanan' => 'datetime',
+
         'selesai_pada' => 'datetime',
+
         'bayar_pada' => 'datetime',
+
         'total_harga' => 'decimal:2',
+
         'jumlah_bayar' => 'decimal:2',
+
         'kembalian' => 'decimal:2',
+
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | User
+    |--------------------------------------------------------------------------
+    */
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Meja
+    |--------------------------------------------------------------------------
+    */
+
     public function meja()
     {
         return $this->belongsTo(Meja::class);
     }
 
-    public function items()
+    /*
+    |--------------------------------------------------------------------------
+    | Item Pesanan
+    |--------------------------------------------------------------------------
+    */
+
+  public function itemPesanans()
+{
+    return $this->hasMany(ItemPesanan::class);
+}
+    /*
+    |--------------------------------------------------------------------------
+    | Total Item
+    |--------------------------------------------------------------------------
+    */
+
+    public function getTotalItemAttribute()
     {
-        return $this->hasMany(ItemPesanan::class);
+        return $this->itemPesanans->sum('jumlah');
     }
 }

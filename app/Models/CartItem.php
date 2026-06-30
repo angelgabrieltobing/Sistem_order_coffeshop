@@ -2,43 +2,51 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ItemPesanan extends Model
+class CartItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'item_pesanans';
+    protected $table = 'cart_items';
 
     protected $fillable = [
-        'pesanan_id',
+
+        'cart_id',
+
         'menu_id',
-        'jumlah',
+
+        'qty',
+
         'harga',
+
         'subtotal',
-        'catatan',
+
     ];
 
     protected $casts = [
+
         'harga' => 'decimal:2',
+
         'subtotal' => 'decimal:2',
+
     ];
 
     /*
     |--------------------------------------------------------------------------
-    | Relasi Pesanan
+    | Cart
     |--------------------------------------------------------------------------
     */
 
-    public function pesanan()
+    public function cart()
     {
-        return $this->belongsTo(Pesanan::class);
+        return $this->belongsTo(Cart::class);
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Relasi Menu
+    | Menu
     |--------------------------------------------------------------------------
     */
 
