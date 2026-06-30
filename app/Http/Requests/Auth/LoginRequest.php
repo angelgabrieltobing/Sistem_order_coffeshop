@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 class LoginRequest extends FormRequest
 {
     /**
-     * Authorization
+     * Menentukan apakah user diizinkan melakukan request.
      */
     public function authorize(): bool
     {
@@ -20,29 +20,27 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Validation Rules
+     * Aturan validasi form login.
      */
     public function rules(): array
     {
         return [
             'email' => ['required', 'email'],
-            'password' => ['required'],
+            'password' => ['required', 'string'],
         ];
     }
 
     /**
-     * Authenticate User
+     * Proses autentikasi user.
      */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        $credentials = [
-            'email' => $this->email,
-            'password' => $this->password,
-        ];
-
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        if (! Auth::attempt(
+            $this->only('email', 'password'),
+            $this->boolean('remember')
+        )) {
 
             RateLimiter::hit($this->throttleKey());
 
@@ -55,7 +53,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Rate Limiter
+     * Membatasi percobaan login.
      */
     public function ensureIsNotRateLimited(): void
     {
@@ -68,17 +66,20 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => "Terlalu banyak percobaan login. Coba lagi dalam {$seconds} detik.",
+            'email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ]),
         ]);
     }
 
     /**
-     * Throttle Key
+     * Membuat key unik untuk rate limiter.
      */
     public function throttleKey(): string
     {
         return Str::transliterate(
-            Str::lower($this->string('email')).'|'.$this->ip()
+            Str::lower($this->string('email')) . '|' . $this->ip()
         );
     }
 }
