@@ -1,23 +1,18 @@
-@extends('layouts.app')
-
-@section('title', 'Keranjang Belanja')
+@extends('layouts.customer')
 
 @section('content')
 
 <div class="container py-5">
 
-    <h2 class="mb-4 fw-bold">
-        🛒 Keranjang Belanja
+    <h2 class="mb-4">
+        <i class="fa-solid fa-cart-shopping"></i>
+        Keranjang Belanja
     </h2>
 
     @if(session('success'))
-
         <div class="alert alert-success">
-
             {{ session('success') }}
-
         </div>
-
     @endif
 
     @if($cart->items->count())
@@ -26,31 +21,54 @@
 
         <div class="card-body">
 
-            <table class="table table-bordered align-middle">
+            <div class="table-responsive">
 
-                <thead class="table-dark">
+                <table class="table align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>Gambar</th>
+
+                            <th>Menu</th>
+
+                            <th>Harga</th>
+
+                            <th width="170">Qty</th>
+
+                            <th>Subtotal</th>
+
+                            <th width="120">Aksi</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    @foreach($cart->items as $item)
 
                     <tr>
 
-                        <th>Menu</th>
+                        <td width="110">
 
-                        <th width="120">Harga</th>
+                            @if($item->menu->gambar)
 
-                        <th width="140">Qty</th>
+                            <img
+                                src="{{ asset('storage/'.$item->menu->gambar) }}"
+                                class="img-thumbnail"
+                                style="width:90px;height:90px;object-fit:cover;">
 
-                        <th width="150">Subtotal</th>
+                            @else
 
-                        <th width="100">Aksi</th>
+                            <img
+                                src="https://via.placeholder.com/90"
+                                class="img-thumbnail">
 
-                    </tr>
+                            @endif
 
-                </thead>
-
-                <tbody>
-
-                @foreach($cart->items as $item)
-
-                    <tr>
+                        </td>
 
                         <td>
 
@@ -59,6 +77,14 @@
                                 {{ $item->menu->nama }}
 
                             </strong>
+
+                            <br>
+
+                            <small>
+
+                                {{ $item->menu->kategori }}
+
+                            </small>
 
                         </td>
 
@@ -71,8 +97,8 @@
                         <td>
 
                             <form
-                                action="{{ route('cart.update',$item->id) }}"
-                                method="POST">
+                                method="POST"
+                                action="{{ route('cart.update',$item->menu) }}">
 
                                 @csrf
 
@@ -81,12 +107,12 @@
                                     <input
                                         type="number"
                                         name="qty"
-                                        value="{{ $item->qty }}"
+                                        class="form-control"
                                         min="1"
-                                        class="form-control">
+                                        value="{{ $item->qty }}">
 
                                     <button
-                                        class="btn btn-warning">
+                                        class="btn btn-primary">
 
                                         Update
 
@@ -100,15 +126,19 @@
 
                         <td>
 
-                            Rp {{ number_format($item->subtotal,0,',','.') }}
+                            <strong>
+
+                                Rp {{ number_format($item->subtotal,0,',','.') }}
+
+                            </strong>
 
                         </td>
 
                         <td>
 
                             <form
-                                action="{{ route('cart.remove',$item->id) }}"
-                                method="POST">
+                                method="POST"
+                                action="{{ route('cart.remove',$item->menu) }}">
 
                                 @csrf
 
@@ -117,7 +147,7 @@
                                 <button
                                     class="btn btn-danger btn-sm">
 
-                                    Hapus
+                                    <i class="fa fa-trash"></i>
 
                                 </button>
 
@@ -127,58 +157,62 @@
 
                     </tr>
 
-                @endforeach
+                    @endforeach
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
 
-            <hr>
+            </div>
 
-            <div class="d-flex justify-content-between">
+        </div>
 
-                <h4>
+    </div>
 
-                    Total :
+    <div class="row mt-4">
 
-                </h4>
+        <div class="col-md-6">
 
-                <h4 class="text-success">
+            <form
+                method="POST"
+                action="{{ route('cart.clear') }}">
+
+                @csrf
+
+                @method('DELETE')
+
+                <button
+                    class="btn btn-outline-danger">
+
+                    Kosongkan Keranjang
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="col-md-6 text-end">
+
+            <h3>
+
+                Total :
+
+                <span class="text-success">
 
                     Rp {{ number_format($cart->total,0,',','.') }}
 
-                </h4>
+                </span>
 
-            </div>
+            </h3>
 
-            <div class="mt-4 d-flex gap-2">
+            <a
+                href="{{ route('checkout.index') }}"
+                class="btn btn-success btn-lg">
 
-                <form
-                    action="{{ route('cart.clear') }}"
-                    method="POST">
+                Checkout
 
-                    @csrf
-
-                    @method('DELETE')
-
-                    <button
-                        class="btn btn-danger">
-
-                        Kosongkan Keranjang
-
-                    </button>
-
-                </form>
-
-                <a
-                    href="{{ route('checkout.index') }}"
-                    class="btn btn-success">
-
-                    Checkout
-
-                </a>
-
-            </div>
+            </a>
 
         </div>
 
