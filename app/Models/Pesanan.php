@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Pesanan extends Model
 {
@@ -87,10 +87,10 @@ class Pesanan extends Model
     |--------------------------------------------------------------------------
     */
 
-public function itemPesanans()
-{
-    return $this->hasMany(ItemPesanan::class);
-}
+    public function itemPesanans()
+    {
+        return $this->hasMany(ItemPesanan::class);
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -98,9 +98,8 @@ public function itemPesanans()
     |--------------------------------------------------------------------------
     */
 
-
-public function getTotalItemAttribute()
-{
-    return $this->itemPesanans->sum('qty');
-}
+    public function getTotalItemAttribute()
+    {
+        return $this->itemPesanans->sum('qty');
+    }
 }

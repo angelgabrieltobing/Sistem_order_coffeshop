@@ -1,432 +1,390 @@
-@extends('layouts.admin')
+@extends('layouts.customer')
 
-@section('title','Detail Pesanan')
-
-@section('page-title','Detail Pesanan')
+@section('title', 'Detail Pesanan')
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container py-5">
 
-<div class="row">
+    <div class="row justify-content-center">
 
-<div class="col-lg-8">
+        <div class="col-lg-10">
 
-<div class="card shadow">
+            <div class="card shadow border-0">
 
-<div class="card-header bg-primary text-white">
+                <div class="card-header bg-dark text-white">
 
-<h4 class="mb-0">
+                    <div class="d-flex justify-content-between align-items-center">
 
-<i class="fa-solid fa-receipt"></i>
+                        <h4 class="mb-0">
 
-Detail Pesanan
+                            <i class="fa-solid fa-receipt"></i>
 
-</h4>
+                            Detail Pesanan
 
-</div>
+                        </h4>
 
-<div class="card-body">
+                        <span class="badge bg-warning text-dark">
 
-<table class="table table-bordered">
+                            {{ $pesanan->nomor_pesanan }}
 
-<tr>
+                        </span>
 
-<th width="250">
+                    </div>
 
-Nomor Pesanan
+                </div>
 
-</th>
+                <div class="card-body">
 
-<td>
+                    <div class="row">
 
-{{ $pesanan->nomor_pesanan }}
+                        <div class="col-md-6">
 
-</td>
+                            <table class="table table-borderless">
 
-</tr>
+                                <tr>
 
-<tr>
+                                    <th width="180">
 
-<th>
+                                        Nama Customer
 
-Nama Pelanggan
+                                    </th>
 
-</th>
+                                    <td>
 
-<td>
+                                        {{ $pesanan->nama_pelanggan }}
 
-{{ $pesanan->nama_pelanggan }}
+                                    </td>
 
-</td>
+                                </tr>
 
-</tr>
+                                <tr>
 
-<tr>
+                                    <th>
 
-<th>
+                                        Nomor Meja
 
-User
+                                    </th>
 
-</th>
+                                    <td>
 
-<td>
+                                        {{ optional($pesanan->meja)->nomor_meja ?? '-' }}
 
-{{ $pesanan->user->name ?? '-' }}
+                                    </td>
 
-</td>
+                                </tr>
 
-</tr>
+                                <tr>
 
-<tr>
+                                    <th>
 
-<th>
+                                        Tanggal Pesanan
 
-Meja
+                                    </th>
 
-</th>
+                                    <td>
 
-<td>
+                                        {{ optional($pesanan->tanggal_pesanan)->format('d M Y H:i') ?? '-' }}
 
-{{ $pesanan->meja->nomor_meja ?? '-' }}
+                                    </td>
 
-</td>
+                                </tr>
 
-</tr>
+                                <tr>
 
-<tr>
+                                    <th>
 
-<th>
+                                        Metode Pembayaran
 
-Tanggal Pesanan
+                                    </th>
 
-</th>
+                                    <td>
 
-<td>
+                                        {{ $pesanan->metode_pembayaran ?? '-' }}
 
-{{ optional($pesanan->tanggal_pesanan)->format('d F Y H:i') }}
+                                    </td>
 
-</td>
+                                </tr>
 
-</tr>
+                            </table>
 
-<tr>
+                        </div>
 
-<th>
+                        <div class="col-md-6">
 
-Metode Pembayaran
+                            <table class="table table-borderless">
 
-</th>
+                                <tr>
 
-<td>
+                                    <th width="180">
 
-{{ $pesanan->metode_pembayaran }}
+                                        Status Pesanan
 
-</td>
+                                    </th>
 
-</tr>
+                                    <td>
 
-<tr>
+                                        @if($pesanan->status == 'Menunggu')
 
-<th>
+                                            <span class="badge bg-warning">
 
-Status Pembayaran
+                                                Menunggu
 
-</th>
+                                            </span>
 
-<td>
+                                        @elseif($pesanan->status == 'Diproses')
 
-@if($pesanan->status_pembayaran=="Lunas")
+                                            <span class="badge bg-primary">
 
-<span class="badge bg-success">
+                                                Diproses
 
-Lunas
+                                            </span>
 
-</span>
+                                        @elseif($pesanan->status == 'Selesai')
 
-@else
+                                            <span class="badge bg-success">
 
-<span class="badge bg-danger">
+                                                Selesai
 
-Belum Bayar
+                                            </span>
 
-</span>
+                                        @else
 
-@endif
+                                            <span class="badge bg-danger">
 
-</td>
+                                                Dibatalkan
 
-</tr>
+                                            </span>
 
-<tr>
+                                        @endif
 
-<th>
+                                    </td>
 
-Status Pesanan
+                                </tr>
 
-</th>
+                                <tr>
 
-<td>
+                                    <th>
 
-@if($pesanan->status=="Menunggu")
+                                        Status Pembayaran
 
-<span class="badge bg-warning">
+                                    </th>
 
-Menunggu
+                                    <td>
 
-</span>
+                                        @if($pesanan->status_pembayaran == 'Belum Bayar')
 
-@elseif($pesanan->status=="Diproses")
+                                            <span class="badge bg-secondary">
 
-<span class="badge bg-info">
+                                                Belum Bayar
 
-Diproses
+                                            </span>
 
-</span>
+                                        @elseif($pesanan->status_pembayaran == 'Lunas')
 
-@elseif($pesanan->status=="Selesai")
+                                            <span class="badge bg-success">
 
-<span class="badge bg-success">
+                                                Lunas
 
-Selesai
+                                            </span>
 
-</span>
+                                        @elseif($pesanan->status_pembayaran == 'Refund')
 
-@else
+                                            <span class="badge bg-danger">
 
-<span class="badge bg-danger">
+                                                Refund
 
-Dibatalkan
+                                            </span>
 
-</span>
+                                        @endif
 
-@endif
+                                    </td>
 
-</td>
+                                </tr>
 
-</tr>
+                                <tr>
 
-<tr>
+                                    <th>
 
-<th>
+                                        Catatan
 
-Catatan
+                                    </th>
 
-</th>
+                                    <td>
 
-<td>
+                                        {{ $pesanan->catatan ?: '-' }}
 
-{{ $pesanan->catatan ?: '-' }}
+                                    </td>
 
-</td>
+                                </tr>
 
-</tr>
+                            </table>
 
-</table>
+                        </div>
 
-</div>
+                    </div>
 
-</div>
+                    <hr>
 
-</div>
+                    <h5 class="fw-bold mb-3">
 
-<div class="col-lg-4">
+                        Daftar Menu
 
-<div class="card shadow">
+                    </h5>
 
-<div class="card-header bg-success text-white">
+                    <div class="table-responsive">
 
-Ringkasan Pembayaran
+                        <table class="table table-bordered align-middle">
 
-</div>
+                            <thead class="table-light">
 
-<div class="card-body">
+                                <tr>
 
-<table class="table">
+                                    <th width="60">
 
-<tr>
+                                        No
 
-<th>Total Item</th>
+                                    </th>
 
-<td>
+                                    <th>
 
-{{ $pesanan->total_item }}
+                                        Menu
 
-</td>
+                                    </th>
 
-</tr>
+                                    <th width="90">
 
-<tr>
+                                        Qty
 
-<th>Total Harga</th>
+                                    </th>
 
-<td>
+                                    <th width="170">
 
-Rp {{ number_format($pesanan->total_harga,0,',','.') }}
+                                        Harga
 
-</td>
+                                    </th>
 
-</tr>
+                                    <th width="180">
 
-<tr>
+                                        Subtotal
 
-<th>Jumlah Bayar</th>
+                                    </th>
 
-<td>
+                                </tr>
 
-Rp {{ number_format($pesanan->jumlah_bayar,0,',','.') }}
+                            </thead>
 
-</td>
+                            <tbody>
 
-</tr>
+                                @forelse($pesanan->itemPesanans as $item)
 
-<tr>
+                                    <tr>
 
-<th>Kembalian</th>
+                                        <td>
 
-<td>
+                                            {{ $loop->iteration }}
 
-Rp {{ number_format($pesanan->kembalian,0,',','.') }}
+                                        </td>
 
-</td>
+                                        <td>
 
-</tr>
+                                            {{ optional($item->menu)->nama ?? 'Menu telah dihapus' }}
 
-</table>
+                                        </td>
 
-<a
-href="{{ route('admin.pesanan.edit',$pesanan) }}"
-class="btn btn-warning w-100 mb-2">
+                                        <td>
 
-<i class="fa-solid fa-pen"></i>
+                                            {{ $item->qty }}
 
-Update Status
+                                        </td>
 
-</a>
+                                        <td>
 
-<a
-href="{{ route('admin.pesanan.index') }}"
-class="btn btn-secondary w-100">
+                                            Rp {{ number_format($item->harga,0,',','.') }}
 
-<i class="fa-solid fa-arrow-left"></i>
+                                        </td>
 
-Kembali
+                                        <td>
 
-</a>
+                                            Rp {{ number_format($item->subtotal,0,',','.') }}
 
-</div>
+                                        </td>
 
-</div>
+                                    </tr>
 
-</div>
+                                @empty
 
-</div>
+                                    <tr>
 
-<div class="card shadow mt-4">
+                                        <td
+                                            colspan="5"
+                                            class="text-center text-muted">
 
-<div class="card-header bg-dark text-white">
+                                            Belum ada item pesanan.
 
-<h5 class="mb-0">
+                                        </td>
 
-Item Pesanan
+                                    </tr>
 
-</h5>
+                                @endforelse
 
-</div>
+                            </tbody>
 
-<div class="card-body">
+                            <tfoot>
 
-<div class="table-responsive">
+                                <tr class="table-light">
 
-<table class="table table-bordered align-middle">
+                                    <th colspan="4" class="text-end">
 
-<thead class="table-dark">
+                                        Total Bayar
 
-<tr>
+                                    </th>
 
-<th>No</th>
+                                    <th>
 
-<th>Menu</th>
+                                        Rp {{ number_format($pesanan->total_harga,0,',','.') }}
 
-<th>Harga</th>
+                                    </th>
 
-<th>Jumlah</th>
+                                </tr>
 
-<th>Subtotal</th>
+                            </tfoot>
 
-<th>Catatan</th>
+                        </table>
 
-</tr>
+                    </div>
 
-</thead>
+                </div>
 
-<tbody>
+                <div class="card-footer d-flex justify-content-between">
 
-@forelse($pesanan->itemPesanans as $item)
+                    <a
+                        href="{{ route('customer.pesanan.index') }}"
+                        class="btn btn-secondary">
 
-<tr>
+                        <i class="fa-solid fa-arrow-left"></i>
 
-<td>
+                        Kembali
 
-{{ $loop->iteration }}
+                    </a>
 
-</td>
+                    <a
+                        href="{{ route('customer.pesanan.receipt', $pesanan) }}"
+                        class="btn btn-success">
 
-<td>
+                        <i class="fa-solid fa-receipt"></i>
 
-{{ $item->menu->nama ?? '-' }}
+                        Lihat Struk
 
-</td>
+                    </a>
 
-<td>
+                </div>
 
-Rp {{ number_format($item->harga,0,',','.') }}
+            </div>
 
-</td>
+        </div>
 
-<td>
-
-{{ $item->jumlah }}
-
-</td>
-
-<td>
-
-Rp {{ number_format($item->subtotal,0,',','.') }}
-
-</td>
-
-<td>
-
-{{ $item->catatan ?: '-' }}
-
-</td>
-
-</tr>
-
-@empty
-
-<tr>
-
-<td colspan="6" class="text-center">
-
-Belum ada item pesanan.
-
-</td>
-
-</tr>
-
-@endforelse
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 
