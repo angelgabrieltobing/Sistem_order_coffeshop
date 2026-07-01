@@ -25,6 +25,8 @@ class Meja extends Model
 
         'status',
 
+        'jumlah_kursi',
+
         'lokasi',
 
     ];
