@@ -6,21 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('item_pesanans', function (Blueprint $table) {
+
             $table->id();
-            $table->foreignId('pesanan_id')->constrained('pesanans')->onDelete('cascade');
-            $table->foreignId('produk_id')->constrained('produks')->onDelete('cascade');
-            $table->integer('jumlah');
-            $table->decimal('harga', 10, 2);
-            $table->decimal('subtotal', 10, 2);
+
+            $table->foreignId('pesanan_id')
+                ->constrained('pesanans')
+                ->cascadeOnDelete();
+
+            $table->foreignId('menu_id')
+                ->constrained('menus')
+                ->cascadeOnDelete();
+
+            $table->integer('qty');
+
+            $table->decimal('harga',10,2);
+
+            $table->decimal('subtotal',10,2);
+
             $table->text('catatan')->nullable();
+
             $table->timestamps();
+
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('item_pesanans');
     }
