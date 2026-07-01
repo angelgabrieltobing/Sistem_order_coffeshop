@@ -1,76 +1,97 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
 @section('title', 'Checkout')
 
 @section('content')
 
-<div class="container mt-4">
+<div class="container py-5">
 
     <h2 class="mb-4">
         Checkout Pesanan
     </h2>
 
+    {{-- Pesan Error --}}
     @if(session('error'))
         <div class="alert alert-danger">
             {{ session('error') }}
         </div>
     @endif
 
-    <div class="row">
+    {{-- Validasi Error --}}
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        <!-- Form Checkout -->
-        <div class="col-md-7">
+    <form action="{{ route('checkout.store') }}" method="POST">
 
-            <div class="card shadow-sm">
+        @csrf
 
-                <div class="card-header bg-primary text-white">
-                    Data Pemesan
-                </div>
+        <div class="row">
 
-                <div class="card-body">
+            {{-- FORM CUSTOMER --}}
+            <div class="col-lg-7">
 
-                    <form action="{{ route('checkout.store') }}" method="POST">
+                <div class="card shadow-sm mb-4">
 
-                        @csrf
+                    <div class="card-header">
+                        <h5>Data Pelanggan</h5>
+                    </div>
+
+                    <div class="card-body">
 
                         <div class="mb-3">
 
                             <label class="form-label">
-                                Nama Customer
+                                Nama Pelanggan
                             </label>
 
                             <input
                                 type="text"
+                                name="nama_pelanggan"
                                 class="form-control"
-                                value="{{ auth()->user()->name }}"
-                                readonly>
+                                value="{{ old('nama_pelanggan', auth()->user()->name) }}"
+                                required>
 
                         </div>
 
                         <div class="mb-3">
 
                             <label class="form-label">
-                                Pilih Meja
+                                Metode Pembayaran
                             </label>
 
                             <select
-                                name="meja_id"
+                                name="metode_pembayaran"
                                 class="form-select"
                                 required>
 
-                                <option value="">
-                                    -- Pilih Meja --
+                                <option value="">-- Pilih Metode Pembayaran --</option>
+
+                                <option value="Tunai"
+                                    {{ old('metode_pembayaran') == 'Tunai' ? 'selected' : '' }}>
+                                    Tunai
                                 </option>
 
-                                @foreach($mejas as $meja)
+                                <option value="Debit"
+                                    {{ old('metode_pembayaran') == 'Debit' ? 'selected' : '' }}>
+                                    Debit
+                                </option>
 
-                                    <option value="{{ $meja->id }}">
+                                <option value="Kredit"
+                                    {{ old('metode_pembayaran') == 'Kredit' ? 'selected' : '' }}>
+                                    Kredit
+                                </option>
 
-                                        Meja {{ $meja->nomor_meja }}
-
-                                    </option>
-
-                                @endforeach
+                                <option value="QRIS"
+                                    {{ old('metode_pembayaran') == 'QRIS' ? 'selected' : '' }}>
+                                    QRIS
+                                </option>
 
                             </select>
 
@@ -79,116 +100,82 @@
                         <div class="mb-3">
 
                             <label class="form-label">
-
                                 Catatan
-
                             </label>
 
                             <textarea
                                 name="catatan"
-                                rows="4"
-                                class="form-control"
-                                placeholder="Contoh: tanpa gula, es sedikit..."></textarea>
+                                rows="3"
+                                class="form-control">{{ old('catatan') }}</textarea>
 
                         </div>
 
+                    </div>
+
                 </div>
 
             </div>
 
-        </div>
+            {{-- RINGKASAN --}}
+            <div class="col-lg-5">
 
-        <!-- Ringkasan -->
-        <div class="col-md-5">
+                <div class="card shadow-sm">
 
-            <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5>Ringkasan Pesanan</h5>
+                    </div>
 
-                <div class="card-header bg-success text-white">
-
-                    Ringkasan Pesanan
-
-                </div>
-
-                <div class="card-body">
-
-                    <table class="table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>Menu</th>
-
-                                <th>Qty</th>
-
-                                <th>Total</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                        @php
-                            $grandTotal = 0;
-                        @endphp
+                    <div class="card-body">
 
                         @foreach($cart->items as $item)
 
-                            @php
-                                $grandTotal += $item->subtotal;
-                            @endphp
+                            <div class="d-flex justify-content-between mb-3">
 
-                            <tr>
+                                <div>
 
-                                <td>
+                                    <strong>
+                                        {{ $item->menu->nama }}
+                                    </strong>
 
-                                    {{ $item->menu->nama }}
+                                    <br>
 
-                                </td>
+                                    Qty : {{ $item->qty }}
 
-                                <td>
+                                </div>
 
-                                    {{ $item->qty }}
-
-                                </td>
-
-                                <td>
+                                <div>
 
                                     Rp {{ number_format($item->subtotal,0,',','.') }}
 
-                                </td>
+                                </div>
 
-                            </tr>
+                            </div>
 
                         @endforeach
 
-                        </tbody>
+                        <hr>
 
-                    </table>
+                        <div class="d-flex justify-content-between">
 
-                    <hr>
+                            <strong>Total</strong>
 
-                    <h5 class="text-end">
+                            <strong>
 
-                        Total :
-                        <strong class="text-success">
+                                Rp {{ number_format($cart->total,0,',','.') }}
 
-                            Rp {{ number_format($grandTotal,0,',','.') }}
+                            </strong>
 
-                        </strong>
+                        </div>
 
-                    </h5>
+                        <button
+                            type="submit"
+                            class="btn btn-success w-100 mt-4">
 
-                    <button
-                        type="submit"
-                        class="btn btn-success w-100 mt-3">
+                            Buat Pesanan
 
-                        Konfirmasi Pesanan
+                        </button>
 
-                    </button>
-
-                    </form>
+                    </div>
 
                 </div>
 
@@ -196,7 +183,7 @@
 
         </div>
 
-    </div>
+    </form>
 
 </div>
 

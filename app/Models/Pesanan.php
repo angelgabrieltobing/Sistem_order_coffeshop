@@ -87,18 +87,20 @@ class Pesanan extends Model
     |--------------------------------------------------------------------------
     */
 
-  public function itemPesanans()
+public function itemPesanans()
 {
     return $this->hasMany(ItemPesanan::class);
 }
+
     /*
     |--------------------------------------------------------------------------
     | Total Item
     |--------------------------------------------------------------------------
     */
 
-    public function getTotalItemAttribute()
-    {
-        return $this->itemPesanans->sum('jumlah');
-    }
+
+public function getTotalItemAttribute()
+{
+    return $this->itemPesanans->sum('qty');
+}
 }

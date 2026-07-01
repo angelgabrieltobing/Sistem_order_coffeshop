@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class CheckoutController extends Controller
 {
     /**
-     * Menampilkan halaman checkout
+     * Halaman Checkout
      */
     public function index()
     {
@@ -31,14 +31,14 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Proses checkout
+     * Simpan Pesanan
      */
     public function store(Request $request)
     {
         $request->validate([
-            'nama_pelanggan' => 'required|string|max:100',
-            'metode_pembayaran' => 'required|string',
-            'catatan' => 'nullable|string',
+            'nama_pelanggan'    => 'required|string|max:100',
+            'metode_pembayaran' => 'required|string|max:50',
+            'catatan'           => 'nullable|string',
         ]);
 
         $cart = Cart::where('user_id', Auth::id())
@@ -58,51 +58,37 @@ class CheckoutController extends Controller
             $total = $cart->items->sum('subtotal');
 
             $pesanan = Pesanan::create([
-
-                'nomor_pesanan' => 'ORD-' . now()->format('YmdHis'),
-
-                'nama_pelanggan' => $request->nama_pelanggan,
-
-                'user_id' => Auth::id(),
-
-                'meja_id' => null,
-
-                'total_harga' => $total,
-
-                'status' => 'Menunggu',
-
-                'status_pembayaran' => 'Belum Dibayar',
-
+                'nomor_pesanan'     => 'ORD-' . now()->format('YmdHis'),
+                'nama_pelanggan'    => $request->nama_pelanggan,
+                'meja_id'           => 1,
+                'user_id'           => Auth::id(),
+                'total_harga'       => $total,
+                'status'            => 'Menunggu',
+                'status_pembayaran' => 'Belum Bayar',
                 'metode_pembayaran' => $request->metode_pembayaran,
-
-                'jumlah_bayar' => 0,
-
-                'kembalian' => 0,
-
-                'catatan' => $request->catatan,
-
-                'tanggal_pesanan' => now(),
-
+                'jumlah_bayar'      => 0,
+                'kembalian'         => 0,
+                'catatan'           => $request->catatan,
+                'tanggal_pesanan'   => now(),
             ]);
 
             foreach ($cart->items as $item) {
 
-                ItemPesanan::create([
+                if (!$item->menu_id) {
+                    throw new \Exception("CartItem ID {$item->id} tidak memiliki menu_id.");
+                }
 
-                    'pesanan_id' => $pesanan->id,
-
-                    'menu_id' => $item->menu_id,
-
-                    'qty' => $item->qty,
-
-                    'harga' => $item->harga,
-
-                    'subtotal' => $item->subtotal,
-
-                    'catatan' => null,
-
-                ]);
-
+                if (!$item->menu) {
+                    throw new \Exception("Menu dengan ID {$item->menu_id} tidak ditemukan.");
+                }
+ItemPesanan::create([
+    'pesanan_id' => $pesanan->id,
+    'menu_id'    => $item->menu_id,
+    'qty'        => $item->qty,
+    'harga'      => $item->harga,
+    'subtotal'   => $item->subtotal,
+    'catatan'    => null,
+]); 
             }
 
             $cart->items()->delete();
@@ -111,15 +97,16 @@ class CheckoutController extends Controller
 
             return redirect()
                 ->route('home')
-                ->with('success', 'Checkout berhasil.');
-
+                ->with('success', 'Pesanan berhasil dibuat.');
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            return back()->with(
-                'error',
-                'Checkout gagal : ' . $e->getMessage()
+            dd(
+                $e->getMessage(),
+                [
+                    'cart_items' => $cart->items->toArray(),
+                ]
             );
         }
     }

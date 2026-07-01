@@ -16,9 +16,9 @@ class CustomerMiddleware
         }
 
         if (Auth::user()->role !== 'customer') {
-            abort(403);
+            return redirect()->route('admin.dashboard');
         }
 
         return $next($request);
     }
-}
+}   

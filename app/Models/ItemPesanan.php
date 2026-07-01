@@ -11,36 +11,24 @@ class ItemPesanan extends Model
 
     protected $table = 'item_pesanans';
 
-    protected $fillable = [
-        'pesanan_id',
-        'menu_id',
-        'jumlah',
-        'harga',
-        'subtotal',
-        'catatan',
-    ];
+protected $fillable = [
+    'pesanan_id',
+    'menu_id',
+    'qty',
+    'harga',
+    'subtotal',
+    'catatan',
+];
 
     protected $casts = [
         'harga' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Relasi Pesanan
-    |--------------------------------------------------------------------------
-    */
-
     public function pesanan()
     {
         return $this->belongsTo(Pesanan::class);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Relasi Menu
-    |--------------------------------------------------------------------------
-    */
 
     public function menu()
     {
