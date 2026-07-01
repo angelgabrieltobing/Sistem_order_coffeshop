@@ -77,7 +77,9 @@ class CartController extends Controller
             ->firstOrFail();
 
         $item->qty = $request->qty;
+
         $item->subtotal = $item->qty * $item->harga;
+        
         $item->save();
 
         return redirect()
