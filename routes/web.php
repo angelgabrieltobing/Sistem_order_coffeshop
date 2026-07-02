@@ -55,7 +55,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Menu
+    | Menu Customer
     |--------------------------------------------------------------------------
     */
 
@@ -140,15 +140,20 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
-        | Menu
+        | Menu Management (Admin)
         |--------------------------------------------------------------------------
         */
 
+        // Resource untuk CRUD menu
         Route::resource('menu', AdminMenuController::class);
+
+        // Route untuk toggle status menu (Tersedia/Habis)
+        Route::post('/menu/toggle/{id}', [AdminMenuController::class, 'toggleAvailable'])
+            ->name('menu.toggle');
 
         /*
         |--------------------------------------------------------------------------
-        | Pesanan
+        | Pesanan Management
         |--------------------------------------------------------------------------
         */
 
@@ -156,7 +161,7 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
-        | User
+        | User Management
         |--------------------------------------------------------------------------
         */
 

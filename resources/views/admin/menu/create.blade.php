@@ -1,310 +1,88 @@
-@extends('layouts.admin')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Menu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+<body>
 
-@section('title', 'Tambah Menu')
-
-@section('page-title', 'Tambah Menu Coffee Shop')
-
-@section('content')
-
-<div class="container-fluid">
-
-    <div class="card shadow">
-
+<div class="container mt-5">
+    <div class="card shadow col-md-8 mx-auto">
         <div class="card-header bg-success text-white">
-
-            <h4 class="mb-0">
-
-                <i class="fa-solid fa-plus-circle"></i>
-
-                Tambah Menu Baru
-
-            </h4>
-
+            <h4><i class="fa-solid fa-plus"></i> Tambah Menu</h4>
         </div>
-
         <div class="card-body">
 
-            <form
-                action="{{ route('admin.menu.store') }}"
-                method="POST"
-                enctype="multipart/form-data">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
+            <form action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
-                <div class="row">
-
-                    {{-- Nama Menu --}}
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-
-                            Nama Menu
-
-                        </label>
-
-                        <input
-                            type="text"
-                            name="nama"
-                            class="form-control @error('nama') is-invalid @enderror"
-                            value="{{ old('nama') }}"
-                            placeholder="Masukkan nama menu">
-
-                        @error('nama')
-
-                            <div class="invalid-feedback">
-
-                                {{ $message }}
-
-                            </div>
-
-                        @enderror
-
-                    </div>
-
-                    {{-- Kategori --}}
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-
-                            Kategori
-
-                        </label>
-
-                        <select
-                            name="kategori"
-                            class="form-select @error('kategori') is-invalid @enderror">
-
-                            <option value="">-- Pilih Kategori --</option>
-
-                            <option value="Coffee" @selected(old('kategori')=='Coffee')>
-
-                                Coffee
-
-                            </option>
-
-                            <option value="Non Coffee" @selected(old('kategori')=='Non Coffee')>
-
-                                Non Coffee
-
-                            </option>
-
-                            <option value="Tea" @selected(old('kategori')=='Tea')>
-
-                                Tea
-
-                            </option>
-
-                            <option value="Snack" @selected(old('kategori')=='Snack')>
-
-                                Snack
-
-                            </option>
-
-                            <option value="Dessert" @selected(old('kategori')=='Dessert')>
-
-                                Dessert
-
-                            </option>
-
-                        </select>
-
-                        @error('kategori')
-
-                            <div class="invalid-feedback">
-
-                                {{ $message }}
-
-                            </div>
-
-                        @enderror
-
-                    </div>
-
-                    {{-- Harga --}}
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-
-                            Harga
-
-                        </label>
-
-                        <input
-                            type="number"
-                            name="harga"
-                            class="form-control @error('harga') is-invalid @enderror"
-                            value="{{ old('harga') }}"
-                            placeholder="Contoh : 25000">
-
-                        @error('harga')
-
-                            <div class="invalid-feedback">
-
-                                {{ $message }}
-
-                            </div>
-
-                        @enderror
-
-                    </div>
-
-                    {{-- Status --}}
-                    <div class="col-md-6 mb-3">
-
-                        <label class="form-label">
-
-                            Status
-
-                        </label>
-
-                        <select
-                            name="status"
-                            class="form-select @error('status') is-invalid @enderror">
-
-                            <option value="">-- Pilih Status --</option>
-
-                            <option value="Tersedia" @selected(old('status')=='Tersedia')>
-
-                                Tersedia
-
-                            </option>
-
-                            <option value="Habis" @selected(old('status')=='Habis')>
-
-                                Habis
-
-                            </option>
-
-                        </select>
-
-                        @error('status')
-
-                            <div class="invalid-feedback">
-
-                                {{ $message }}
-
-                            </div>
-
-                        @enderror
-
-                    </div>
-
-                    {{-- Deskripsi --}}
-                    <div class="col-md-12 mb-3">
-
-                        <label class="form-label">
-
-                            Deskripsi
-
-                        </label>
-
-                        <textarea
-                            name="deskripsi"
-                            rows="5"
-                            class="form-control @error('deskripsi') is-invalid @enderror"
-                            placeholder="Masukkan deskripsi menu...">{{ old('deskripsi') }}</textarea>
-
-                        @error('deskripsi')
-
-                            <div class="invalid-feedback">
-
-                                {{ $message }}
-
-                            </div>
-
-                        @enderror
-
-                    </div>
-
-                    {{-- Upload Gambar --}}
-                    <div class="col-md-12 mb-4">
-
-                        <label class="form-label">
-
-                            Gambar Menu
-
-                        </label>
-
-                        <input
-                            type="file"
-                            name="gambar"
-                            id="gambar"
-                            class="form-control @error('gambar') is-invalid @enderror"
-                            accept="image/*">
-
-                        @error('gambar')
-
-                            <div class="invalid-feedback">
-
-                                {{ $message }}
-
-                            </div>
-
-                        @enderror
-
-                    </div>
-
-                    {{-- Preview --}}
-                    <div class="col-md-12 mb-4 text-center">
-
-                        <img
-                            id="preview"
-                            src="https://via.placeholder.com/250x250?text=Preview"
-                            class="img-thumbnail"
-                            style="max-width:250px;">
-
-                    </div>
-
+                <div class="mb-3">
+                    <label class="form-label">Nama Menu <span class="text-danger">*</span></label>
+                    <input type="text" name="nama" class="form-control" required>
                 </div>
 
-                <hr>
-
-                <div class="d-flex justify-content-between">
-
-                    <a
-                        href="{{ route('admin.menu.index') }}"
-                        class="btn btn-secondary">
-
-                        <i class="fa-solid fa-arrow-left"></i>
-
-                        Kembali
-
-                    </a>
-
-                    <button
-                        type="submit"
-                        class="btn btn-success">
-
-                        <i class="fa-solid fa-floppy-disk"></i>
-
-                        Simpan Menu
-
-                    </button>
-
+                <div class="mb-3">
+                    <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                    <select name="kategori" class="form-control" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Coffee">Coffee</option>
+                        <option value="Non-Coffee">Non-Coffee</option>
+                        <option value="Food">Food</option>
+                        <option value="Snack">Snack</option>
+                        <option value="Dessert">Dessert</option>
+                    </select>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
+                    <input type="number" name="harga" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="deskripsi" rows="3" class="form-control"></textarea>
+                </div>
+
+                <!-- UPLOAD GAMBAR -->
+                <div class="mb-3">
+                    <label class="form-label">Gambar</label>
+                    <input type="file" 
+                           name="gambar" 
+                           accept="image/*" 
+                           class="form-control">
+                    <small class="text-muted">Format: JPEG, PNG, JPG (Max 2MB)</small>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="is_available" value="1" class="form-check-input" checked>
+                    <label class="form-check-label">Tersedia</label>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-save"></i> Simpan
+                </button>
+                <a href="{{ route('admin.menu.index') }}" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali
+                </a>
             </form>
 
         </div>
-
     </div>
-
 </div>
 
-<script>
-
-document.getElementById('gambar').addEventListener('change', function(e){
-
-    const file = e.target.files[0];
-
-    if(file){
-
-        document.getElementById('preview').src = URL.createObjectURL(file);
-
-    }
-
-});
-
-</script>
-
-@endsection
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

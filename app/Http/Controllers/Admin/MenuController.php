@@ -3,123 +3,118 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MenuRequest;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    /**
-     * Menampilkan daftar menu.
-     */
-    public function index(Request $request)
+    // Tampilkan semua menu
+    public function index()
     {
-        $query = Menu::query();
-
-        // Search
-        if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%');
-        }
-
-        // Filter Status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Filter Kategori
-        if ($request->filled('kategori')) {
-            $query->where('kategori', $request->kategori);
-        }
-
-        $menus = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
+        $menus = Menu::all();
         return view('admin.menu.index', compact('menus'));
     }
 
-    /**
-     * Form tambah menu.
-     */
+    // Form tambah menu
     public function create()
     {
         return view('admin.menu.create');
     }
 
-    /**
-     * Simpan menu baru.
-     */
-    public function store(MenuRequest $request)
+    // Simpan menu baru
+    public function store(Request $request)
     {
-        $data = $request->validated();
+        $request->validate([
+            'nama' => 'required|min:3|max:255',
+            'kategori' => 'required',
+            'harga' => 'required|numeric|min:1000',
+            'deskripsi' => 'nullable',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
 
+        $data = $request->all();
+        $data['is_available'] = $request->has('is_available') ? 1 : 0;
+
+        // Upload gambar
         if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('menu', 'public');
+            $file = $request->file('gambar');
+            $namaFile = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('menu', $namaFile, 'public');
+            $data['gambar'] = $path;
         }
 
         Menu::create($data);
 
-        return redirect()
-            ->route('admin.menu.index')
-            ->with('success', 'Menu berhasil ditambahkan.');
+        return redirect()->route('admin.menu.index')
+            ->with('success', 'Menu berhasil ditambahkan!');
     }
 
-    /**
-     * Detail menu.
-     */
-    public function show(Menu $menu)
+    // Form edit menu
+    public function edit($id)
     {
-        return view('admin.menu.show', compact('menu'));
-    }
-
-    /**
-     * Form edit menu.
-     */
-    public function edit(Menu $menu)
-    {
+        $menu = Menu::findOrFail($id);
         return view('admin.menu.edit', compact('menu'));
     }
 
-    /**
-     * Update menu.
-     */
-    public function update(MenuRequest $request, Menu $menu)
+    // Update menu
+    public function update(Request $request, $id)
     {
-        $data = $request->validated();
+        $menu = Menu::findOrFail($id);
 
+        $request->validate([
+            'nama' => 'required|min:3|max:255',
+            'kategori' => 'required',
+            'harga' => 'required|numeric|min:1000',
+            'deskripsi' => 'nullable',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = $request->all();
+        $data['is_available'] = $request->has('is_available') ? 1 : 0;
+
+        // Upload gambar baru
         if ($request->hasFile('gambar')) {
-
             // Hapus gambar lama
-            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+            if ($menu->gambar) {
                 Storage::disk('public')->delete($menu->gambar);
             }
 
-            // Upload gambar baru
-            $data['gambar'] = $request->file('gambar')->store('menu', 'public');
+            $file = $request->file('gambar');
+            $namaFile = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('menu', $namaFile, 'public');
+            $data['gambar'] = $path;
         }
 
         $menu->update($data);
 
-        return redirect()
-            ->route('admin.menu.index')
-            ->with('success', 'Menu berhasil diperbarui.');
+        return redirect()->route('admin.menu.index')
+            ->with('success', 'Menu berhasil diupdate!');
     }
 
-    /**
-     * Hapus menu.
-     */
-    public function destroy(Menu $menu)
+    // Hapus menu
+    public function destroy($id)
     {
-        if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+        $menu = Menu::findOrFail($id);
+
+        if ($menu->gambar) {
             Storage::disk('public')->delete($menu->gambar);
         }
 
         $menu->delete();
 
-        return redirect()
-            ->route('admin.menu.index')
-            ->with('success', 'Menu berhasil dihapus.');
+        return redirect()->route('admin.menu.index')
+            ->with('success', 'Menu berhasil dihapus!');
+    }
+
+    // Toggle status (Tersedia/Habis)
+    public function toggleAvailable($id)
+    {
+        $menu = Menu::findOrFail($id);
+        $menu->is_available = !$menu->is_available;
+        $menu->save();
+
+        return redirect()->route('admin.menu.index')
+            ->with('success', 'Status menu berhasil diubah!');
     }
 }

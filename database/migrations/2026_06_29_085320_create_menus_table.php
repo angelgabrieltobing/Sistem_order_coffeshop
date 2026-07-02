@@ -6,38 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('menus', function (Blueprint $table) {
-
             $table->id();
-
             $table->string('nama');
-
             $table->string('kategori');
-
             $table->integer('harga');
-
             $table->text('deskripsi')->nullable();
-
+            $table->boolean('is_available')->default(true);
             $table->string('gambar')->nullable();
-
-            $table->enum('status', [
-                'Tersedia',
-                'Habis'
-            ])->default('Tersedia');
-
             $table->timestamps();
-
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('menus');
