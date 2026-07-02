@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Meja;
 use App\Models\Pesanan;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -22,9 +23,7 @@ class DashboardController extends Controller
         */
 
         $totalUser = User::count();
-
         $totalAdmin = User::where('role', 'admin')->count();
-
         $totalCustomer = User::where('role', 'customer')->count();
 
         /*
@@ -34,6 +33,8 @@ class DashboardController extends Controller
         */
 
         $totalMenu = Menu::count();
+        $menuTersedia = Menu::where('is_available', 1)->count(); // TAMBAHKAN INI
+        $menuHabis = Menu::where('is_available', 0)->count();    // TAMBAHKAN INI
 
         /*
         |--------------------------------------------------------------------------
@@ -42,10 +43,9 @@ class DashboardController extends Controller
         */
 
         $totalMeja = Meja::count();
-
         $mejaTersedia = Meja::where('status', 'tersedia')->count();
-
         $mejaTerisi = Meja::where('status', 'terisi')->count();
+        $mejaDipesan = Meja::where('status', 'dipesan')->count(); // TAMBAHKAN INI
 
         /*
         |--------------------------------------------------------------------------
@@ -54,13 +54,9 @@ class DashboardController extends Controller
         */
 
         $totalPesanan = Pesanan::count();
-
         $pesananMenunggu = Pesanan::where('status', 'Menunggu')->count();
-
         $pesananDiproses = Pesanan::where('status', 'Diproses')->count();
-
         $pesananSelesai = Pesanan::where('status', 'Selesai')->count();
-
         $pesananDibatalkan = Pesanan::where('status', 'Dibatalkan')->count();
 
         /*
@@ -69,16 +65,8 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $totalPendapatan = Pesanan::where(
-                'status_pembayaran',
-                'Lunas'
-            )
-            ->sum('total_harga');
-
-        $pendapatanHariIni = Pesanan::whereDate(
-                'tanggal_pesanan',
-                today()
-            )
+        $totalPendapatan = Pesanan::where('status_pembayaran', 'Lunas')->sum('total_harga');
+        $pendapatanHariIni = Pesanan::whereDate('tanggal_pesanan', today())
             ->where('status_pembayaran', 'Lunas')
             ->sum('total_harga');
 
@@ -88,14 +76,8 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $menus = Menu::latest()
-            ->take(5)
-            ->get();
-
-        $pesananTerbaru = Pesanan::with([
-                'user',
-                'meja'
-            ])
+        $menus = Menu::latest()->take(5)->get();
+        $pesananTerbaru = Pesanan::with(['user', 'meja'])
             ->latest()
             ->take(5)
             ->get();
@@ -107,39 +89,52 @@ class DashboardController extends Controller
         */
 
         return view('admin.dashboard', compact(
-
             'totalMenu',
-
+            'menuTersedia',      // TAMBAHKAN
+            'menuHabis',         // TAMBAHKAN
             'totalUser',
-
             'totalAdmin',
-
             'totalCustomer',
-
             'totalMeja',
-
             'mejaTersedia',
-
             'mejaTerisi',
-
+            'mejaDipesan',       // TAMBAHKAN
             'totalPesanan',
-
             'pesananMenunggu',
-
             'pesananDiproses',
-
             'pesananSelesai',
-
             'pesananDibatalkan',
-
             'totalPendapatan',
-
             'pendapatanHariIni',
-
             'menus',
-
             'pesananTerbaru'
-
         ));
+    }
+
+    /**
+     * Halaman Laporan
+     */
+    public function laporan()
+    {
+        $pesanan = Pesanan::with(['user', 'meja'])
+            ->latest()
+            ->get();
+
+        $totalPendapatan = Pesanan::where('status_pembayaran', 'Lunas')->sum('total_harga');
+        $totalPesanan = Pesanan::count();
+
+        return view('admin.laporan.index', compact('pesanan', 'totalPendapatan', 'totalPesanan'));
+    }
+
+    /**
+     * Export Laporan (PDF/Excel)
+     */
+    public function exportLaporan()
+    {
+        // Implementasi export laporan
+        // Bisa menggunakan paket: maatwebsite/excel atau barryvdh/laravel-dompdf
+
+        return redirect()->route('admin.laporan')
+            ->with('info', 'Fitur export laporan sedang dalam pengembangan.');
     }
 }

@@ -31,9 +31,13 @@
     {{-- Pesan Error --}}
     @if(session('error'))
 
-        <div class="alert alert-danger">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+            <i class="fa-solid fa-exclamation-circle"></i>
 
             {{ session('error') }}
+
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 
         </div>
 
@@ -42,9 +46,13 @@
     {{-- Pesan Success --}}
     @if(session('success'))
 
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+            <i class="fa-solid fa-check-circle"></i>
 
             {{ session('success') }}
+
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 
         </div>
 
@@ -53,7 +61,9 @@
     {{-- Validasi --}}
     @if($errors->any())
 
-        <div class="alert alert-danger">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+            <i class="fa-solid fa-exclamation-triangle"></i>
 
             <ul class="mb-0">
 
@@ -64,6 +74,8 @@
                 @endforeach
 
             </ul>
+
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 
         </div>
 
@@ -79,9 +91,11 @@
 
                 <div class="card shadow-sm">
 
-                    <div class="card-header">
+                    <div class="card-header bg-primary text-white">
 
                         <h5 class="mb-0">
+
+                            <i class="fa-solid fa-user"></i>
 
                             Data Customer
 
@@ -95,7 +109,9 @@
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
+
+                                <i class="fa-solid fa-user"></i>
 
                                 Nama Customer
 
@@ -106,7 +122,8 @@
                                 name="nama_pelanggan"
                                 value="{{ old('nama_pelanggan', auth()->user()->name) }}"
                                 class="form-control @error('nama_pelanggan') is-invalid @enderror"
-                                required>
+                                required
+                                placeholder="Masukkan nama Anda">
 
                             @error('nama_pelanggan')
 
@@ -124,7 +141,9 @@
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
+
+                                <i class="fa-solid fa-chair"></i>
 
                                 Pilih Meja
 
@@ -141,19 +160,28 @@
 
                                 </option>
 
-                                @foreach($mejas as $meja)
+                                {{-- PERBAIKAN: Tampilkan data meja --}}
+                                @forelse($mejas as $meja)
 
                                     <option
                                         value="{{ $meja->id }}"
                                         @selected(old('meja_id') == $meja->id)>
 
-                                        {{ $meja->nomor_meja }}
+                                        Meja {{ $meja->nomor_meja }}
 
-                                        ({{ $meja->kapasitas }} Orang)
+                                        (Kapasitas: {{ $meja->kapasitas ?? 4 }} Orang)
 
                                     </option>
 
-                                @endforeach
+                                @empty
+
+                                    <option value="" disabled>
+
+                                        -- Tidak ada meja tersedia --
+
+                                    </option>
+
+                                @endforelse
 
                             </select>
 
@@ -167,13 +195,28 @@
 
                             @enderror
 
+                            {{-- PERBAIKAN: Notifikasi jika meja kosong --}}
+                            @if($mejas->isEmpty())
+
+                                <small class="text-danger">
+
+                                    <i class="fa-solid fa-exclamation-circle"></i>
+
+                                    Tidak ada meja tersedia. Silakan hubungi admin.
+
+                                </small>
+
+                            @endif
+
                         </div>
 
                         {{-- Pembayaran --}}
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
+
+                                <i class="fa-solid fa-money-bill-wave"></i>
 
                                 Metode Pembayaran
 
@@ -222,6 +265,14 @@
 
                                 </option>
 
+                                <option
+                                    value="E-Wallet"
+                                    @selected(old('metode_pembayaran')=='E-Wallet')>
+
+                                    E-Wallet (OVO, GoPay, DANA)
+
+                                </option>
+
                             </select>
 
                             @error('metode_pembayaran')
@@ -240,7 +291,9 @@
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label class="form-label fw-bold">
+
+                                <i class="fa-solid fa-pen"></i>
 
                                 Catatan
 
@@ -249,7 +302,8 @@
                             <textarea
                                 name="catatan"
                                 rows="4"
-                                class="form-control">{{ old('catatan') }}</textarea>
+                                class="form-control"
+                                placeholder="Tambahkan catatan untuk pesanan Anda...">{{ old('catatan') }}</textarea>
 
                         </div>
 
@@ -265,9 +319,11 @@
 
                 <div class="card shadow-sm">
 
-                    <div class="card-header">
+                    <div class="card-header bg-success text-white">
 
                         <h5 class="mb-0">
+
+                            <i class="fa-solid fa-receipt"></i>
 
                             Ringkasan Pesanan
 
@@ -277,63 +333,116 @@
 
                     <div class="card-body">
 
-                        @foreach($cart->items as $item)
+                        {{-- PERBAIKAN: Cek apakah cart memiliki items --}}
+                        @if(isset($cart) && $cart->items && $cart->items->count() > 0)
 
-                            <div class="d-flex justify-content-between mb-3">
+                            @foreach($cart->items as $item)
 
-                                <div>
+                                <div class="d-flex justify-content-between mb-3 pb-2 border-bottom">
 
-                                    <strong>
+                                    <div>
 
-                                        {{ optional($item->menu)->nama ?? 'Menu telah dihapus' }}
+                                        <strong>
 
-                                    </strong>
+                                            {{ optional($item->menu)->nama ?? 'Menu telah dihapus' }}
 
-                                    <br>
+                                        </strong>
 
-                                    Qty : {{ $item->qty }}
+                                        <br>
+
+                                        <small class="text-muted">
+
+                                            <i class="fa-solid fa-cubes"></i>
+
+                                            Qty : {{ $item->qty }}
+
+                                        </small>
+
+                                    </div>
+
+                                    <div class="text-end">
+
+                                        <span class="fw-bold">
+
+                                            Rp {{ number_format($item->subtotal,0,',','.') }}
+
+                                        </span>
+
+                                    </div>
 
                                 </div>
 
-                                <div>
+                            @endforeach
 
-                                    Rp {{ number_format($item->subtotal,0,',','.') }}
+                            <hr>
 
-                                </div>
+                            <div class="d-flex justify-content-between">
+
+                                <h5 class="fw-bold">
+
+                                    <i class="fa-solid fa-calculator"></i>
+
+                                    Total
+
+                                </h5>
+
+                                <h5 class="text-success fw-bold">
+
+                                    Rp {{ number_format($cart->total ?? 0,0,',','.') }}
+
+                                </h5>
 
                             </div>
 
-                        @endforeach
+                            <button
+                                type="submit"
+                                class="btn btn-success w-100 mt-4 py-2">
 
-                        <hr>
+                                <i class="fa-solid fa-check"></i>
 
-                        <div class="d-flex justify-content-between">
+                                Buat Pesanan
 
-                            <h5>
+                            </button>
 
-                                Total
+                        @else
 
-                            </h5>
+                            <div class="text-center py-4">
 
-                            <h5 class="text-success">
+                                <i class="fa-solid fa-cart-empty fa-3x text-muted"></i>
 
-                                Rp {{ number_format($cart->total,0,',','.') }}
+                                <p class="text-muted mt-2">
 
-                            </h5>
+                                    Keranjang kosong. Silakan tambahkan menu terlebih dahulu.
 
-                        </div>
+                                </p>
 
-                        <button
-                            type="submit"
-                            class="btn btn-success w-100 mt-4">
+                                <a href="{{ url('/menu') }}" class="btn btn-primary">
 
-                            <i class="fa-solid fa-check"></i>
+                                    <i class="fa-solid fa-utensils"></i>
 
-                            Buat Pesanan
+                                    Lihat Menu
 
-                        </button>
+                                </a>
+
+                            </div>
+
+                        @endif
 
                     </div>
+
+                </div>
+
+                {{-- Tombol Kembali --}}
+
+                <div class="mt-3">
+
+                    <a href="{{ url('/cart') }}" class="btn btn-outline-secondary w-100">
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Kembali ke Keranjang
+
+                    </a>
 
                 </div>
 

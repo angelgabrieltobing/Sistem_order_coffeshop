@@ -108,6 +108,27 @@ background:#8b5e34;
 
 }
 
+.text-warning {
+    color: #f39c12 !important;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.text-warning:hover {
+    text-decoration: underline;
+}
+
+.back-home {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.back-home:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
 </style>
 
 </head>
@@ -222,11 +243,12 @@ Login
 
 </div>
 
+{{-- PERBAIKAN DI SINI --}}
 <div class="text-center mt-3">
 
 <a
-href="{{ route('home') }}"
-class="text-white">
+href="{{ url('/') }}"
+class="back-home">
 
 ← Kembali ke Home
 

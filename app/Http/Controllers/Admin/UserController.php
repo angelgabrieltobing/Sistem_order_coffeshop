@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -19,21 +20,15 @@ class UserController extends Controller
 
         // Pencarian
         if ($request->filled('search')) {
-
             $query->where(function ($q) use ($request) {
-
                 $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
-
             });
-
         }
 
         // Filter Role
         if ($request->filled('role')) {
-
             $query->where('role', $request->role);
-
         }
 
         $users = $query
@@ -58,27 +53,17 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-
             'name' => 'required|string|max:255',
-
             'email' => 'required|email|unique:users,email',
-
             'password' => 'required|min:6|confirmed',
-
-            'role' => 'required|in:admin,customer',
-
+            'role' => ['required', Rule::in(['admin', 'customer'])],
         ]);
 
         User::create([
-
             'name' => $request->name,
-
             'email' => $request->email,
-
             'password' => Hash::make($request->password),
-
             'role' => $request->role,
-
         ]);
 
         return redirect()
@@ -91,7 +76,9 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return view('admin.user.show', compact('user'));
+        // Tampilkan detail pesanan user jika ada
+        $pesanan = $user->pesanan()->latest()->take(10)->get();
+        return view('admin.user.show', compact('user', 'pesanan'));
     }
 
     /**
@@ -107,37 +94,23 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-
         $request->validate([
-
             'name' => 'required|string|max:255',
-
             'email' => 'required|email|unique:users,email,' . $user->id,
-
-            'role' => 'required|in:admin,customer',
-
+            'role' => ['required', Rule::in(['admin', 'customer'])],
         ]);
 
         $data = [
-
             'name' => $request->name,
-
             'email' => $request->email,
-
             'role' => $request->role,
-
         ];
 
         if ($request->filled('password')) {
-
             $request->validate([
-
                 'password' => 'min:6|confirmed'
-
             ]);
-
             $data['password'] = Hash::make($request->password);
-
         }
 
         $user->update($data);
@@ -152,11 +125,14 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-
+        // Cegah menghapus akun sendiri
         if (Auth::id() == $user->id) {
-
             return back()->with('error', 'Anda tidak dapat menghapus akun sendiri.');
+        }
 
+        // Cegah menghapus admin terakhir
+        if ($user->role === 'admin' && User::where('role', 'admin')->count() <= 1) {
+            return back()->with('error', 'Tidak dapat menghapus admin terakhir.');
         }
 
         $user->delete();

@@ -47,7 +47,8 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended('/admin/dashboard');
         }
 
-        return redirect()->route('menu');
+        // PERBAIKAN: Customer redirect ke halaman menu
+        return redirect('/menu');
     }
 
     /**
@@ -61,6 +62,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        // PERBAIKAN: Redirect ke halaman utama
+        return redirect('/');
     }
 }

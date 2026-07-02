@@ -5,6 +5,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Login | Coffee Shop</title>
 
@@ -43,6 +44,8 @@
             justify-content:center;
 
             align-items:center;
+
+            padding:20px;
 
         }
 
@@ -90,6 +93,11 @@
 
         }
 
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(196, 123, 57, 0.5);
+            border-color: #c47b39;
+        }
+
         .btn-login{
 
             width:100%;
@@ -106,12 +114,80 @@
 
             font-weight:bold;
 
+            transition: all 0.3s ease;
+
         }
 
         .btn-login:hover{
 
             background:#8b5e34;
 
+            transform: scale(1.02);
+
+        }
+
+        .text-warning {
+            color: #f39c12 !important;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .text-warning:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-home:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.9);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+        }
+
+        .form-check-label {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .form-check-input:checked {
+            background-color: #c47b39;
+            border-color: #c47b39;
+        }
+
+        label {
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 25px;
+                width: 100%;
+            }
+            .logo {
+                font-size: 40px;
+            }
+            h2 {
+                font-size: 22px;
+            }
         }
 
     </style>
@@ -134,111 +210,118 @@
 
 <form method="POST" action="{{ route('login') }}">
 
-@csrf
+    @csrf
 
-@if(session('success'))
+    @if(session('success'))
 
-<div class="alert alert-success">
+    <div class="alert alert-success">
 
-{{ session('success') }}
+        {{ session('success') }}
 
-</div>
+    </div>
 
-@endif
+    @endif
 
-@if($errors->any())
+    @if($errors->any())
 
-<div class="alert alert-danger">
+    <div class="alert alert-danger">
 
-@foreach($errors->all() as $error)
+        @foreach($errors->all() as $error)
 
-<div>{{ $error }}</div>
+        <div>{{ $error }}</div>
 
-@endforeach
+        @endforeach
 
-</div>
+    </div>
 
-@endif
+    @endif
 
-<div class="mb-3">
+    <div class="mb-3">
 
-<label>Email</label>
+        <label>Email</label>
 
-<input
-type="email"
-name="email"
-value="{{ old('email') }}"
-class="form-control"
-required>
+        <input
+        type="email"
+        name="email"
+        value="{{ old('email') }}"
+        class="form-control"
+        placeholder="Masukkan email Anda"
+        required
+        autofocus>
 
-</div>
+    </div>
 
-<div class="mb-3">
+    <div class="mb-3">
 
-<label>Password</label>
+        <label>Password</label>
 
-<input
-type="password"
-name="password"
-class="form-control"
-required>
+        <input
+        type="password"
+        name="password"
+        class="form-control"
+        placeholder="Masukkan password Anda"
+        required>
 
-</div>
+    </div>
 
-<div class="form-check mb-3">
+    <div class="form-check mb-3">
 
-<input
-class="form-check-input"
-type="checkbox"
-name="remember">
+        <input
+        class="form-check-input"
+        type="checkbox"
+        name="remember"
+        id="remember">
 
-<label class="form-check-label">
+        <label class="form-check-label" for="remember">
 
-Remember Me
+            Remember Me
 
-</label>
+        </label>
 
-</div>
+    </div>
 
-<button
-type="submit"
-class="btn btn-login">
+    <button
+    type="submit"
+    class="btn btn-login">
 
-Login
+    <i class="fa-solid fa-sign-in-alt"></i> Login
 
-</button>
+    </button>
 
-<div class="text-center mt-4">
+    <div class="text-center mt-4">
 
-Belum punya akun?
+        Belum punya akun?
 
-<a
-href="{{ route('register') }}"
-class="text-warning">
+        <a
+        href="{{ route('register') }}"
+        class="text-warning">
 
-Register
+        Register
 
-</a>
+        </a>
 
-</div>
+    </div>
 
-<div class="text-center mt-3">
+    <div class="text-center mt-3">
 
-<a
-href="{{ route('home') }}"
-class="text-white">
+        <a
+        href="{{ url('/') }}"
+        class="back-home">
 
-← Kembali ke Home
+        ← Kembali ke Home
 
-</a>
+        </a>
 
-</div>
+    </div>
 
 </form>
 
 </div>
 
 </div>
+
+<!-- Font Awesome untuk icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </body>
 

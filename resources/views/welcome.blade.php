@@ -1,773 +1,293 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Coffee Shop Laravel</title>
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Coffee Shop - Selamat Datang</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-
     <style>
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:'Poppins',sans-serif;
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        html{
-            scroll-behavior:smooth;
+        /* ===== NAVBAR ===== */
+        .navbar-custom {
+            background: linear-gradient(135deg, #2d3436, #1a1a2e);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .navbar-custom .brand {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .navbar-custom .brand i {
+            color: #f39c12;
+            margin-right: 10px;
+        }
+        .navbar-custom .nav-link {
+            color: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #fff;
+        }
+        .navbar-custom .nav-link.active {
+            color: #f39c12;
         }
 
-        body{
-            background:#f8f5f2;
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            padding: 100px 0 80px;
+            border-radius: 0 0 50px 50px;
+            margin-bottom: 40px;
+        }
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+        }
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        .hero .btn-hero {
+            background: #fff;
+            color: #6c5ce7;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        .hero .btn-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        .navbar{
-            background:#2b1d16;
-            transition:.3s;
+        /* ===== FEATURES ===== */
+        .feature-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(108, 92, 231, 0.15);
+        }
+        .feature-card i {
+            font-size: 48px;
+            color: #6c5ce7;
+            margin-bottom: 15px;
+        }
+        .feature-card h5 {
+            font-weight: 700;
         }
 
-        .navbar-brand{
-            color:#fff;
-            font-size:30px;
-            font-weight:bold;
+        /* ===== MENU PREVIEW ===== */
+        .menu-preview-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+        }
+        .menu-preview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .menu-preview-card img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .menu-preview-card .price {
+            color: #e17055;
+            font-weight: 700;
+            font-size: 18px;
         }
 
-        .navbar-brand:hover{
-            color:#ffc107;
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #2d3436;
+            color: rgba(255,255,255,0.7);
+            padding: 40px 0;
+            margin-top: 50px;
         }
-
-        .nav-link{
-            color:white !important;
-            margin-left:18px;
-            font-weight:500;
+        .footer a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
         }
-
-        .nav-link:hover{
-            color:#ffc107 !important;
+        .footer a:hover {
+            color: #fff;
         }
-
-        .hero{
-            height:100vh;
-            background:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80');
-            background-size:cover;
-            background-position:center;
-            position:relative;
-        }
-
-        .hero::before{
-            content:"";
-            position:absolute;
-            inset:0;
-            background:rgba(0,0,0,.60);
-        }
-
-        .hero-content{
-            position:relative;
-            z-index:10;
-            height:100%;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            flex-direction:column;
-            text-align:center;
-            color:white;
-        }
-
-        .hero h1{
-            font-size:70px;
-            font-weight:700;
-        }
-
-        .hero p{
-            font-size:22px;
-            margin:20px 0;
-        }
-
-        .btn-coffee{
-
-            background:#c47b39;
-            color:white;
-            border:none;
-            padding:14px 35px;
-            border-radius:50px;
-            transition:.3s;
-
-        }
-
-        .btn-coffee:hover{
-
-            background:#8b5e34;
-            color:white;
-            transform:translateY(-3px);
-
-        }
-
-        .menu{
-
-            padding:90px 0;
-
-        }
-
-        .card{
-
-            border:none;
-            transition:.3s;
-
-        }
-
-        .card:hover{
-
-            transform:translateY(-8px);
-
-            box-shadow:0 10px 25px rgba(0,0,0,.20);
-
-        }
-
-        .card img{
-
-            height:250px;
-
-            object-fit:cover;
-
-        }
-
-        footer{
-
-            background:#2b1d16;
-
-            color:white;
-
-            padding:25px;
-
-        }
-
     </style>
-
 </head>
-
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-
-<div class="container">
-
-<a
-class="navbar-brand"
-href="{{ route('home') }}">
-
-☕ Coffee Shop
-
-</a>
-
-<button
-class="navbar-toggler"
-data-bs-toggle="collapse"
-data-bs-target="#navbarCoffee">
-
-<span class="navbar-toggler-icon"></span>
-
-</button>
-
-<div
-class="collapse navbar-collapse"
-id="navbarCoffee">
-
-<ul class="navbar-nav ms-auto align-items-center">
-
-<li class="nav-item">
-
-<a
-href="{{ route('home') }}"
-class="nav-link">
-
-Home
-
-</a>
-
-</li>
-
-<li class="nav-item">
-
-<a
-href="#menu-kopi"
-class="nav-link">
-
-Menu
-
-</a>
-
-</li>
-
-<li class="nav-item">
-
-<a
-href="#about"
-class="nav-link">
-
-Tentang
-
-</a>
-
-</li>
-
-@auth
-
-    @if(Auth::user()->role == 'admin')
-
-        <li class="nav-item">
-
-            <a
-            href="{{ route('admin.dashboard') }}"
-            class="nav-link">
-
-                Dashboard
-
-            </a>
-
-        </li>
-
-    @else
-
-        <li class="nav-item">
-
-            <a
-            href="{{ route('menu') }}"
-            class="nav-link">
-
-                Menu
-
-            </a>
-
-        </li>
-
-        <li class="nav-item">
-
-            <a
-            href="{{ route('cart.index') }}"
-            class="nav-link">
-
-                <i class="fa-solid fa-cart-shopping"></i>
-
-                Keranjang
-
-            </a>
-
-        </li>
-
-    @endif
-
-    <li class="nav-item dropdown ms-3">
-
-        <a
-        class="btn btn-warning dropdown-toggle"
-        href="#"
-        role="button"
-        data-bs-toggle="dropdown">
-
-            {{ Auth::user()->name }}
-
-        </a>
-
-        <ul class="dropdown-menu dropdown-menu-end">
-
-            <li>
-
-                <form
-                action="{{ route('logout') }}"
-                method="POST">
-
-                    @csrf
-
-                    <button
-                    class="dropdown-item">
-
-                        Logout
-
-                    </button>
-
-                </form>
-
-            </li>
-
-        </ul>
-
-    </li>
-
-@endauth
-
-@guest
-
-<li class="nav-item ms-2">
-
-<a
-href="{{ route('login') }}"
-class="btn btn-warning">
-
-Login
-
-</a>
-
-</li>
-
-<li class="nav-item ms-2">
-
-<a
-href="{{ route('register') }}"
-class="btn btn-outline-light">
-
-Register
-
-</a>
-
-</li>
-
-@endguest
-
-</ul>
-
-</div>
-
-</div>
-
-</nav>
-<!-- ===========================
-     HERO SECTION
-============================ -->
-
-<section class="hero">
-
-    <div class="hero-content">
-
-        <h1>
-
-            Nikmati Kopi Terbaik
-
-        </h1>
-
-        <p>
-
-            Kopi Premium dengan cita rasa terbaik untuk menemani harimu.
-
-        </p>
-
-        <a
-            href="#menu-kopi"
-            class="btn btn-coffee btn-lg">
-
-            Lihat Menu
-
-        </a>
-
-    </div>
-
-</section>
-
-
-<!-- ===========================
-     MENU
-============================ -->
-
-<section
-class="menu"
-id="menu-kopi">
-
-<div class="container">
-
-<div class="text-center mb-5">
-
-<h2 class="fw-bold">
-
-Menu Favorit
-
-</h2>
-
-<p class="text-muted">
-
-Semua menu di bawah ini diambil langsung dari database Laravel.
-
-</p>
-
-</div>
-
-
-<div class="row">
-
-@forelse($menus as $menu)
-
-<div class="col-lg-4 col-md-6 mb-4">
-
-<div class="card h-100 shadow-sm">
-
-@if($menu->gambar)
-
-<img
-src="{{ asset('storage/'.$menu->gambar) }}"
-class="card-img-top">
-
-@else
-
-<img
-src="https://via.placeholder.com/600x400?text=Coffee"
-class="card-img-top">
-
-@endif
-
-
-<div class="card-body d-flex flex-column">
-
-<h4 class="fw-bold">
-
-{{ $menu->nama }}
-
-</h4>
-
-<span class="badge bg-secondary mb-2">
-
-{{ $menu->kategori }}
-
-</span>
-
-<p class="text-muted">
-
-{{ \Illuminate\Support\Str::limit($menu->deskripsi,90) }}
-
-</p>
-
-<div class="mt-auto">
-
-<h4 class="text-success">
-
-Rp {{ number_format($menu->harga,0,',','.') }}
-
-</h4>
-
-@if($menu->status=="Tersedia")
-
-<span class="badge bg-success mb-3">
-
-Tersedia
-
-</span>
-
-<form
-action="{{ route('cart.add',$menu) }}"
-method="POST">
-
-@csrf
-
-<button
-class="btn btn-success w-100">
-
-<i class="fa-solid fa-cart-shopping"></i>
-
-Tambah ke Keranjang
-
-</button>
-
-</form>
-
-@else
-
-<span class="badge bg-danger mb-3">
-
-Habis
-
-</span>
-
-<button
-class="btn btn-secondary w-100"
-disabled>
-
-Menu Habis
-
-</button>
-
-@endif
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-@empty
-
-<div class="col-12">
-
-<div class="alert alert-warning text-center">
-
-<h4>
-
-Belum Ada Menu
-
-</h4>
-
-<p>
-
-Silakan tambahkan menu melalui Dashboard Admin.
-
-</p>
-
-</div>
-
-</div>
-
-@endforelse
-
-</div>
-
-</div>
-
-</section>
-<!-- ==========================================
-                TENTANG
-========================================== -->
-
-<section class="py-5 bg-light" id="about">
-
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar-custom">
     <div class="container">
-
-        <div class="row align-items-center">
-
-            <div class="col-lg-6">
-
-                <img
-                    src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80"
-                    class="img-fluid rounded shadow">
-
-            </div>
-
-            <div class="col-lg-6">
-
-                <h2 class="fw-bold mb-4">
-
-                    Tentang Coffee Shop
-
-                </h2>
-
-                <p class="text-muted">
-
-                    Coffee Shop merupakan sistem pemesanan minuman berbasis Laravel
-                    yang memudahkan pelanggan melakukan pemesanan secara online
-                    sekaligus membantu admin mengelola menu, pesanan,
-                    pembayaran, dan laporan.
-
-                </p>
-
-                <p class="text-muted">
-
-                    Seluruh data menu ditampilkan langsung dari database sehingga
-                    perubahan yang dilakukan Admin akan langsung terlihat oleh
-                    pelanggan.
-
-                </p>
-
-                <a
-                    href="{{ route('menu') }}"
-                    class="btn btn-coffee">
-
-                    Lihat Semua Menu
-
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url('/') }}" class="brand">
+                <i class="fa-solid fa-mug-saucer"></i> Coffee Shop
+            </a>
+            <div>
+                <a href="{{ url('/') }}" class="nav-link active d-inline">
+                    <i class="fa-solid fa-house"></i> Home
                 </a>
-
+                {{-- PERBAIKAN: Menggunakan url('/menu') --}}
+                <a href="{{ url('/menu') }}" class="nav-link d-inline ms-3">
+                    <i class="fa-solid fa-utensils"></i> Menu
+                </a>
+                <a href="{{ route('tentang') }}" class="nav-link d-inline ms-3">
+                    <i class="fa-solid fa-info-circle"></i> Tentang
+                </a>
+                @auth
+                    <a href="#" class="nav-link d-inline ms-3">
+                        <i class="fa-solid fa-user"></i> {{ auth()->user()->name }}
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-sm ms-2">
+                            <i class="fa-solid fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="nav-link d-inline ms-3">
+                        <i class="fa-solid fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="{{ route('register') }}" class="nav-link d-inline ms-3">
+                        <i class="fa-solid fa-user-plus"></i> Register
+                    </a>
+                @endauth
             </div>
-
         </div>
-
     </div>
+</nav>
 
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="container text-center">
+        <h1>☕ Nikmati Kopi Terbaik</h1>
+        <p class="mb-4">Temukan berbagai pilihan kopi premium dengan cita rasa terbaik</p>
+        {{-- PERBAIKAN: Menggunakan url('/menu') --}}
+        <a href="{{ url('/menu') }}" class="btn-hero">
+            <i class="fa-solid fa-utensils"></i> Lihat Menu
+        </a>
+    </div>
 </section>
 
-<!-- ==========================================
-                FOOTER
-========================================== -->
-
-<footer>
-
-    <div class="container">
-
-        <div class="row">
-
-            <div class="col-md-4">
-
-                <h4>
-
-                    ☕ Coffee Shop
-
-                </h4>
-
-                <p>
-
-                    Sistem Pemesanan Coffee Shop
-                    berbasis Laravel 12.
-
-                </p>
-
+<!-- ===== FEATURES ===== -->
+<section class="container mb-5">
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="feature-card">
+                <i class="fa-solid fa-mug-saucer"></i>
+                <h5>Kopi Premium</h5>
+                <p class="text-muted small">Biji kopi pilihan dari berbagai daerah</p>
             </div>
-
-            <div class="col-md-4">
-
-                <h5>
-
-                    Navigasi
-
-                </h5>
-
-                <ul class="list-unstyled">
-
-                    <li>
-
-                        <a
-                            href="{{ route('home') }}"
-                            class="text-white text-decoration-none">
-
-                            Home
-
-                        </a>
-
-                    </li>
-
-                    <li>
-
-                        <a
-                            href="{{ route('menu') }}"
-                            class="text-white text-decoration-none">
-
-                            Menu
-
-                        </a>
-
-                    </li>
-
-                    <li>
-
-                        <a
-                            href="#about"
-                            class="text-white text-decoration-none">
-
-                            Tentang
-
-                        </a>
-
-                    </li>
-
-                </ul>
-
-            </div>
-
-            <div class="col-md-4 text-md-end">
-
-                <h5>
-
-                    Contact
-
-                </h5>
-
-                <p>
-
-                    📍 Indonesia
-
-                </p>
-
-                <p>
-
-                    ☎ +62 812-3456-7890
-
-                </p>
-
-                <p>
-
-                    ✉ admin@coffeeshop.com
-
-                </p>
-
-            </div>
-
         </div>
-
-        <hr class="border-light">
-
-        <div class="text-center">
-
-            © {{ date('Y') }}
-
-            Coffee Shop Laravel
-
-            | Developed by Feliks Team
-
+        <div class="col-md-3">
+            <div class="feature-card">
+                <i class="fa-solid fa-bolt"></i>
+                <h5>Pesanan Cepat</h5>
+                <p class="text-muted small">Proses pemesanan yang mudah dan cepat</p>
+            </div>
         </div>
+        <div class="col-md-3">
+            <div class="feature-card">
+                <i class="fa-solid fa-tag"></i>
+                <h5>Harga Terjangkau</h5>
+                <p class="text-muted small">Harga bersahabat dengan kualitas terbaik</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="feature-card">
+                <i class="fa-solid fa-headset"></i>
+                <h5>Dukungan 24/7</h5>
+                <p class="text-muted small">Layanan pelanggan siap membantu</p>
+            </div>
+        </div>
+    </div>
+</section>
 
+<!-- ===== MENU PREVIEW ===== -->
+<section class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fa-solid fa-utensils text-primary"></i> Menu Favorit</h3>
+        {{-- PERBAIKAN: Menggunakan url('/menu') --}}
+        <a href="{{ url('/menu') }}" class="btn btn-outline-primary">
+            Lihat Semua <i class="fa-solid fa-arrow-right"></i>
+        </a>
     </div>
 
+    @if(isset($menus) && $menus->count() > 0)
+        <div class="row g-4">
+            @foreach($menus as $menu)
+            <div class="col-md-4 col-lg-3">
+                <div class="card menu-preview-card">
+                    @if($menu->gambar)
+                        <img src="{{ asset('storage/' . $menu->gambar) }}" class="card-img-top" alt="{{ $menu->nama }}">
+                    @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($menu->nama) }}&background=6c5ce7&color=fff&size=200" class="card-img-top" alt="{{ $menu->nama }}">
+                    @endif
+                    <div class="card-body text-center">
+                        <h6 class="fw-bold">{{ $menu->nama }}</h6>
+                        <span class="badge bg-secondary">{{ $menu->kategori ?? 'Minuman' }}</span>
+                        <h6 class="price mt-2">Rp {{ number_format($menu->harga, 0, ',', '.') }}</h6>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    @else
+        <div class="text-center py-5">
+            <i class="fa-solid fa-utensils fa-3x text-muted"></i>
+            <p class="text-muted mt-2">Menu belum tersedia</p>
+        </div>
+    @endif
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5 class="text-white"><i class="fa-solid fa-mug-saucer"></i> Coffee Shop</h5>
+                <p>Nikmati kopi terbaik dengan cita rasa yang menggugah selera.</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-white">Menu</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url('/menu') }}">Daftar Menu</a></li>
+                    <li><a href="{{ route('tentang') }}">Tentang Kami</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-white">Kontak</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fa-solid fa-envelope"></i> info@coffeeshop.com</li>
+                    <li><i class="fa-solid fa-phone"></i> (021) 1234-5678</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="border-secondary">
+        <p class="text-center mb-0">
+            <i class="fa-regular fa-copyright"></i> {{ date('Y') }} Coffee Shop. All Rights Reserved.
+        </p>
+    </div>
 </footer>
 
-<!-- ==========================================
-            BACK TO TOP
-========================================== -->
-
-<button
-    id="topButton"
-    class="btn btn-warning rounded-circle"
-    style="
-        display:none;
-        position:fixed;
-        bottom:25px;
-        right:25px;
-        width:50px;
-        height:50px;
-        z-index:999;
-    ">
-
-    ↑
-
-</button>
-
-<!-- Bootstrap -->
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-
-const topButton = document.getElementById("topButton");
-
-window.addEventListener("scroll",function(){
-
-    if(window.scrollY > 300){
-
-        topButton.style.display="block";
-
-    }else{
-
-        topButton.style.display="none";
-
-    }
-
-});
-
-topButton.addEventListener("click",function(){
-
-    window.scrollTo({
-
-        top:0,
-
-        behavior:"smooth"
-
-    });
-
-});
-
-</script>
-
 </body>
 </html>

@@ -58,16 +58,15 @@ class DatabaseSeeder extends Seeder
         // =========================
         // MEJA
         // =========================
-        for ($i = 1; $i <= 10; $i++) {
-            Meja::updateOrCreate(
-                ['nomor_meja' => $i],
-                [
-                    'kapasitas' => 4,
-                    'status' => 'Kosong',
-                ]
-            );
-        }
-
+       for ($i = 1; $i <= 10; $i++) {
+    Meja::updateOrCreate(
+        ['nomor_meja' => $i],
+        [
+            'kapasitas' => 4,
+            'status' => 'tersedia',  // ✅ Gunakan 'tersedia'
+        ]
+    );
+}
         // =========================
         // PRODUK
         // =========================
