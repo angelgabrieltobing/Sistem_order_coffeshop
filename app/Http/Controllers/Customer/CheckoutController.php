@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
-use App\Models\Pesanan;
 use App\Models\ItemPesanan;
+use App\Models\Meja;
+use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,15 @@ class CheckoutController extends Controller
                 ->with('error', 'Keranjang masih kosong.');
         }
 
-        return view('customer.checkout.index', compact('cart'));
+        $mejas = Meja::where('status', 'tersedia')
+            ->where('aktif', true)
+            ->orderBy('nomor_meja')
+            ->get();
+
+        return view('customer.checkout.index', compact(
+            'cart',
+            'mejas'
+        ));
     }
 
     /**
@@ -37,6 +46,7 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'nama_pelanggan'    => 'required|string|max:100',
+            'meja_id'           => 'required|exists:mejas,id',
             'metode_pembayaran' => 'required|string|max:50',
             'catatan'           => 'nullable|string',
         ]);
@@ -55,59 +65,137 @@ class CheckoutController extends Controller
 
         try {
 
+            /*
+            |--------------------------------------------------------------------------
+            | Cek Meja
+            |--------------------------------------------------------------------------
+            */
+
+            $meja = Meja::lockForUpdate()->findOrFail($request->meja_id);
+
+            if ($meja->status != 'tersedia') {
+
+                DB::rollBack();
+
+                return back()->with(
+                    'error',
+                    'Meja yang dipilih sudah digunakan.'
+                );
+
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Total
+            |--------------------------------------------------------------------------
+            */
+
             $total = $cart->items->sum('subtotal');
 
+            /*
+            |--------------------------------------------------------------------------
+            | Simpan Pesanan
+            |--------------------------------------------------------------------------
+            */
+
             $pesanan = Pesanan::create([
+
                 'nomor_pesanan'     => 'ORD-' . now()->format('YmdHis'),
+
                 'nama_pelanggan'    => $request->nama_pelanggan,
-                'meja_id'           => 1,
+
+                'meja_id'           => $meja->id,
+
                 'user_id'           => Auth::id(),
+
                 'total_harga'       => $total,
+
                 'status'            => 'Menunggu',
+
                 'status_pembayaran' => 'Belum Bayar',
+
                 'metode_pembayaran' => $request->metode_pembayaran,
+
                 'jumlah_bayar'      => 0,
+
                 'kembalian'         => 0,
+
                 'catatan'           => $request->catatan,
+
                 'tanggal_pesanan'   => now(),
+
             ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Item Pesanan
+            |--------------------------------------------------------------------------
+            */
 
             foreach ($cart->items as $item) {
 
-                if (!$item->menu_id) {
-                    throw new \Exception("CartItem ID {$item->id} tidak memiliki menu_id.");
+                if (!$item->menu) {
+                    throw new \Exception(
+                        "Menu dengan ID {$item->menu_id} tidak ditemukan."
+                    );
                 }
 
-                if (!$item->menu) {
-                    throw new \Exception("Menu dengan ID {$item->menu_id} tidak ditemukan.");
-                }
-ItemPesanan::create([
-    'pesanan_id' => $pesanan->id,
-    'menu_id'    => $item->menu_id,
-    'qty'        => $item->qty,
-    'harga'      => $item->harga,
-    'subtotal'   => $item->subtotal,
-    'catatan'    => null,
-]); 
+                ItemPesanan::create([
+
+                    'pesanan_id' => $pesanan->id,
+
+                    'menu_id'    => $item->menu_id,
+
+                    'qty'        => $item->qty,
+
+                    'harga'      => $item->harga,
+
+                    'subtotal'   => $item->subtotal,
+
+                    'catatan'    => null,
+
+                ]);
+
             }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Status Meja
+            |--------------------------------------------------------------------------
+            */
+
+            $meja->update([
+
+                'status' => 'terisi',
+
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Kosongkan Keranjang
+            |--------------------------------------------------------------------------
+            */
 
             $cart->items()->delete();
 
             DB::commit();
 
             return redirect()
-                ->route('home')
-                ->with('success', 'Pesanan berhasil dibuat.');
+                ->route('customer.pesanan.index')
+                ->with(
+                    'success',
+                    'Pesanan berhasil dibuat.'
+                );
+
         } catch (\Exception $e) {
 
             DB::rollBack();
 
-            dd(
-                $e->getMessage(),
-                [
-                    'cart_items' => $cart->items->toArray(),
-                ]
+            return back()->with(
+                'error',
+                $e->getMessage()
             );
+
         }
     }
 }

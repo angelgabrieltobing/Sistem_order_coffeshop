@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PesananController extends Controller
 {
@@ -13,27 +14,98 @@ class PesananController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Pesanan::with(['user', 'meja'])
-            ->latest();
+        $query = Pesanan::with([
+            'user',
+            'meja'
+        ])->latest();
 
-        // Cari Nomor Pesanan / Nama Pelanggan
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->filled('search')) {
 
             $query->where(function ($q) use ($request) {
 
                 $q->where('nomor_pesanan', 'like', '%' . $request->search . '%')
-                  ->orWhere('nama_pelanggan', 'like', '%' . $request->search . '%');
+                    ->orWhere('nama_pelanggan', 'like', '%' . $request->search . '%');
 
             });
 
         }
 
-        // Filter Status
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Status
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->filled('status')) {
 
             $query->where('status', $request->status);
 
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Status Pembayaran
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('status_pembayaran')) {
+
+            $query->where(
+                'status_pembayaran',
+                $request->status_pembayaran
+            );
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistik
+        |--------------------------------------------------------------------------
+        */
+
+        $totalPesanan = Pesanan::count();
+
+        $pesananHariIni = Pesanan::whereDate(
+            'tanggal_pesanan',
+            today()
+        )->count();
+
+        $pendapatan = Pesanan::where(
+            'status_pembayaran',
+            'Lunas'
+        )->sum('total_harga');
+
+        $menunggu = Pesanan::where(
+            'status',
+            'Menunggu'
+        )->count();
+
+        $diproses = Pesanan::where(
+            'status',
+            'Diproses'
+        )->count();
+
+        $selesai = Pesanan::where(
+            'status',
+            'Selesai'
+        )->count();
+
+        $dibatalkan = Pesanan::where(
+            'status',
+            'Dibatalkan'
+        )->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagination
+        |--------------------------------------------------------------------------
+        */
 
         $pesanans = $query
             ->paginate(10)
@@ -41,7 +113,16 @@ class PesananController extends Controller
 
         return view(
             'admin.pesanan.index',
-            compact('pesanans')
+            compact(
+                'pesanans',
+                'totalPesanan',
+                'pesananHariIni',
+                'pendapatan',
+                'menunggu',
+                'diproses',
+                'selesai',
+                'dibatalkan'
+            )
         );
     }
 
@@ -63,7 +144,7 @@ class PesananController extends Controller
     }
 
     /**
-     * Form Edit Status
+     * Form Edit
      */
     public function edit(Pesanan $pesanan)
     {
@@ -80,32 +161,108 @@ class PesananController extends Controller
     {
         $request->validate([
 
-            'status' => [
-                'required',
-                'in:Menunggu,Diproses,Selesai,Dibatalkan'
-            ],
+            'status' => 'required|in:Menunggu,Diproses,Selesai,Dibatalkan',
 
-            'status_pembayaran' => [
-                'required',
-                'in:Belum Bayar,Lunas'
-            ],
+            'status_pembayaran' => 'required|in:Belum Bayar,Lunas,Refund',
 
         ]);
 
-        $pesanan->update([
+        DB::beginTransaction();
 
-            'status' => $request->status,
+        try {
 
-            'status_pembayaran' => $request->status_pembayaran,
+            $pesanan->status = $request->status;
 
-        ]);
+            $pesanan->status_pembayaran = $request->status_pembayaran;
 
-        return redirect()
-            ->route('admin.pesanan.index')
-            ->with(
-                'success',
-                'Status pesanan berhasil diperbarui.'
+            /*
+            |--------------------------------------------------------------------------
+            | Status Pesanan
+            |--------------------------------------------------------------------------
+            */
+
+            if ($request->status == 'Selesai') {
+
+                if (!$pesanan->selesai_pada) {
+
+                    $pesanan->selesai_pada = now();
+
+                }
+
+            } else {
+
+                $pesanan->selesai_pada = null;
+
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Status Pembayaran
+            |--------------------------------------------------------------------------
+            */
+
+            if ($request->status_pembayaran == 'Lunas') {
+
+                if (!$pesanan->bayar_pada) {
+
+                    $pesanan->bayar_pada = now();
+
+                }
+
+            } else {
+
+                $pesanan->bayar_pada = null;
+
+            }
+
+            $pesanan->save();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Status Meja
+            |--------------------------------------------------------------------------
+            */
+
+            if ($pesanan->meja) {
+
+                if (
+                    $request->status == 'Selesai' ||
+                    $request->status == 'Dibatalkan'
+                ) {
+
+                    $pesanan->meja->update([
+                        'status' => 'tersedia',
+                    ]);
+
+                } else {
+
+                    $pesanan->meja->update([
+                        'status' => 'terisi',
+                    ]);
+
+                }
+
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.pesanan.index')
+                ->with(
+                    'success',
+                    'Status pesanan berhasil diperbarui.'
+                );
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->with(
+                'error',
+                $e->getMessage()
             );
+
+        }
     }
 
     /**
@@ -113,13 +270,38 @@ class PesananController extends Controller
      */
     public function destroy(Pesanan $pesanan)
     {
-        $pesanan->delete();
+        DB::beginTransaction();
 
-        return redirect()
-            ->route('admin.pesanan.index')
-            ->with(
-                'success',
-                'Pesanan berhasil dihapus.'
+        try {
+
+            if ($pesanan->meja) {
+
+                $pesanan->meja->update([
+                    'status' => 'tersedia',
+                ]);
+
+            }
+
+            $pesanan->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.pesanan.index')
+                ->with(
+                    'success',
+                    'Pesanan berhasil dihapus.'
+                );
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return back()->with(
+                'error',
+                $e->getMessage()
             );
+
+        }
     }
 }

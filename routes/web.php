@@ -23,6 +23,7 @@ use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\MenuController as CustomerMenuController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
+use App\Http\Controllers\Customer\HistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +43,7 @@ Route::view('/tentang', 'tentang')
 |--------------------------------------------------------------------------
 */
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -50,10 +51,22 @@ require __DIR__.'/auth.php';
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth','customer'])->group(function () {
+Route::middleware(['auth', 'customer'])->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Menu
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/menu', [CustomerMenuController::class, 'index'])
         ->name('menu');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cart
+    |--------------------------------------------------------------------------
+    */
 
     Route::get('/cart', [CartController::class, 'index'])
         ->name('cart.index');
@@ -70,12 +83,41 @@ Route::middleware(['auth','customer'])->group(function () {
     Route::delete('/cart/clear', [CartController::class, 'clear'])
         ->name('cart.clear');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Checkout
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/checkout', [CheckoutController::class, 'index'])
         ->name('checkout.index');
 
     Route::post('/checkout', [CheckoutController::class, 'store'])
         ->name('checkout.store');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Riwayat Pesanan Customer
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/pesanan', [HistoryController::class, 'index'])
+        ->name('customer.pesanan.index');
+
+    Route::get('/pesanan/{pesanan}', [HistoryController::class, 'show'])
+        ->name('customer.pesanan.show');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Receipt / Struk
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/pesanan/{pesanan}/receipt', [HistoryController::class, 'receipt'])
+        ->name('customer.pesanan.receipt');
+
 });
+
 /*
 |--------------------------------------------------------------------------
 | Admin Area
@@ -83,16 +125,40 @@ Route::middleware(['auth','customer'])->group(function () {
 */
 
 Route::prefix('admin')
-    ->middleware(['auth','admin'])
+    ->middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Menu
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource('menu', AdminMenuController::class);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Pesanan
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource('pesanan', PesananController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | User
+        |--------------------------------------------------------------------------
+        */
 
         Route::resource('users', UserController::class);
 
